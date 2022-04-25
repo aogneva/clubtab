@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-person
+      author: anna_ogneva
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: person
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: second_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: dob
+                  type: DATE
+            tableName: person

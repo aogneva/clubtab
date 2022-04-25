@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/clubtab
+    username: postgres
+    password: postgres
+    initialization-mode: never
+    continue-on-error: false
+  jpa:
+    show-sql: true
+    generate-ddl: false
