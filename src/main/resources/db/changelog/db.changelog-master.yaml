@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/db.changelog-yaml-create-person.yaml
+  - include:
+      file: db/changelog/db.changelog-yaml-create-service-type.yaml
