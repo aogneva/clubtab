@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: service-type-insert
+      author: anna_ogneva
+      changes:
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (1,"Маникюр", "NAIL_MANICURE", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (2,"Педикюр", "NAIL_PEDICURE", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (3,"Массаж лица", "BODY_MASSAGE", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (4,"Пиллинг", "BODY_PILLING", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (5,"Стрижка", "HAIR_CUT", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (6,"Окрашивание", "HAIR_COLOR", "BEAUTY")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (7,"Пилатес", "GROUP_PILATES", "FITNESS")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (8,"Йога Хатха начинающие", "GROUP_HATHA_I", "FITNESS")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (9,"Йога Хатха 2 уровень", "GROUP_HATHA_II", "FITNESS")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (10,"Фитнес-зал посещение", "FITNESS_ROOM", "FITNESS")
+        - sql:
+            sql: insert into service_type(id, name, tag, gist) values (11,"Консультация фитнес-тренера", "FITNESS_CONSULT", "FITNESS")

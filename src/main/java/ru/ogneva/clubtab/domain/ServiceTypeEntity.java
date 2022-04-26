@@ -14,11 +14,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name="service_type")
-public class ServiceType {
+public class ServiceTypeEntity {
     @Id
     @Column(name="id")
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="name")
