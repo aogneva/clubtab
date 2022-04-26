@@ -1,8 +1,7 @@
 package ru.ogneva.clubtab.service;
 
-
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import ru.ogneva.clubtab.domain.PersonEntity;
 import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
 
@@ -14,8 +13,6 @@ import java.util.stream.Collectors;
 public class PersonService {
     final private PersonRepository personRepository;
 
-    final private ModelMapper mapper = new ModelMapper();
-
     PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
     }
@@ -23,14 +20,13 @@ public class PersonService {
     public List<PersonDTO> getAll() {
         return personRepository.findAll()
                 .stream()
-                .map(personEntity ->
-                    mapper.map(personEntity, PersonDTO.class))
+                .map(PersonEntity::toDto)
                 .collect(Collectors.toList());
     }
 
     public Optional<PersonDTO> getOne(Long id) {
         return personRepository.findById(id)
-                .map(personEntity -> mapper.map(personEntity, PersonDTO.class));
+                .map(PersonEntity::toDto);
     }
 
     public void deleteOne(Long id) {

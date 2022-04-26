@@ -4,6 +4,8 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.ogneva.clubtab.dto.PersonDTO;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
@@ -12,6 +14,7 @@ import java.util.Date;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name="person")
 public class PersonEntity {
@@ -34,6 +37,20 @@ public class PersonEntity {
     @Column(name="dob")
     @NotNull
     private Date dob;
+
+    public PersonDTO toDto() {
+        return new PersonDTO(id, firstName, secondName, lastName, dob);
+    }
+
+    public static PersonEntity toEntity(PersonDTO personDTO) {
+        return new PersonEntity(
+                personDTO.getId(),
+                personDTO.getFirstName(),
+                personDTO.getSecondName(),
+                personDTO.getLastName(),
+                personDTO.getDob()
+        );
+    }
 
     public boolean equals(Object obj) {
         if (obj == null) {

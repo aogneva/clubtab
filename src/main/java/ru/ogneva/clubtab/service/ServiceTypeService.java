@@ -1,6 +1,5 @@
 package ru.ogneva.clubtab.service;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ru.ogneva.clubtab.domain.ServiceTypeEntity;
 import ru.ogneva.clubtab.dto.ServiceTypeDTO;
@@ -14,21 +13,18 @@ import java.util.stream.Collectors;
 public class ServiceTypeService {
     final private ServiceTypeRepository serviceTypeRepository;
 
-    final private ModelMapper mapper = new ModelMapper();
-
     ServiceTypeService(ServiceTypeRepository serviceTypeRepository) {
         this.serviceTypeRepository = serviceTypeRepository;
     }
 
     public List<ServiceTypeDTO> getAll() {
-        return serviceTypeRepository.findAll().stream().map(sdEntity ->
-                mapper.map(sdEntity, ServiceTypeDTO.class))
+        return serviceTypeRepository.findAll().stream()
+                .map(ServiceTypeEntity::toDto)
                 .collect(Collectors.toList());
     }
 
     public Optional<ServiceTypeDTO> get(Long id) {
-        return serviceTypeRepository.findById(id).map(sdEntity ->
-                this.mapper.map(sdEntity, ServiceTypeDTO.class));
+        return serviceTypeRepository.findById(id).map(ServiceTypeEntity::toDto);
     }
 
 
