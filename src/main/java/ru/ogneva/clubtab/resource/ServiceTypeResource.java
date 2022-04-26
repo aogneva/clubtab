@@ -1,9 +1,6 @@
 package ru.ogneva.clubtab.resource;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.ogneva.clubtab.dto.ServiceTypeDTO;
 import ru.ogneva.clubtab.service.ServiceTypeService;
 
@@ -25,7 +22,8 @@ public class ServiceTypeResource {
     }
 
     @GetMapping(value="/{id}")
-    public Optional<ServiceTypeDTO> get(@PathVariable("id") Long id) {
-        return serviceTypeService.get(id);
+    public ServiceTypeDTO get(@PathVariable("id") Long id) {
+        return serviceTypeService.get(id).orElse(null);
     }
+
 }

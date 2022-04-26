@@ -5,7 +5,9 @@ import ru.ogneva.clubtab.domain.PersonEntity;
 import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,4 +35,8 @@ public class PersonService {
         personRepository.deleteById(id);
     }
 
+    public PersonDTO save(Long id, String firstName, String secondName, String lastName, Date dob) {
+        PersonEntity personEntity = personRepository.save(new PersonEntity(id, firstName, secondName, lastName, dob));
+        return personEntity.toDto();
+    }
 }
