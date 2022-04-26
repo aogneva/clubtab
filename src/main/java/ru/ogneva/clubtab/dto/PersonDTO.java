@@ -1,18 +1,16 @@
 package ru.ogneva.clubtab.dto;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class PersonEntityDTO {
+public class PersonDTO {
     private Long id;
     private String firstName;
     private String secondName;
@@ -29,7 +27,7 @@ public class PersonEntityDTO {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        PersonEntityDTO other = (PersonEntityDTO) obj;
+        PersonDTO other = (PersonDTO) obj;
         if (firstName == null) {
             if (other.getFirstName() != null)
                 return false;
