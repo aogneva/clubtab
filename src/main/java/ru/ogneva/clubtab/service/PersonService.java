@@ -36,7 +36,8 @@ public class PersonService {
     }
 
     public PersonDTO save(Long id, String firstName, String secondName, String lastName, Date dob) {
-        PersonEntity personEntity = personRepository.save(new PersonEntity(id, firstName, secondName, lastName, dob));
+        PersonEntity newPersonEntity = new PersonEntity(id, firstName, secondName, lastName, dob);
+        PersonEntity personEntity = personRepository.save(newPersonEntity);
         return personEntity.toDto();
     }
 }

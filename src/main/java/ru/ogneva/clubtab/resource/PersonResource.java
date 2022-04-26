@@ -36,12 +36,16 @@ public class PersonResource {
             @RequestParam("lastName") String lastName,
             @RequestParam("dob") String dob
     ) {
+        System.out.println("Create Person");
         try {
             Date date = (new SimpleDateFormat("dd.MM.yyyy")).parse(dob);
-            return personService.save(null, firstName, secondName, lastName, date);
+            PersonDTO personDTO = personService.save(null, firstName, secondName, lastName, date);
+            System.out.println("New Person: " + personDTO.toString());
+            return personDTO;
         } catch (ParseException e) {
-            return null;
+            System.out.printf("Create Person Error: %s%n", e.getMessage());
         }
+        return null;
     }
 
     @PutMapping(value="/update")
