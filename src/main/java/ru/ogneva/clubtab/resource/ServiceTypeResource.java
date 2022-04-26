@@ -11,11 +11,14 @@ import ru.ogneva.clubtab.service.ServiceTypeService;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/service-type")
 public class ServiceTypeResource {
-    private ServiceTypeService serviceTypeService;
+    final private ServiceTypeService serviceTypeService;
+
+    ServiceTypeResource(ServiceTypeService serviceTypeService) {
+        this.serviceTypeService = serviceTypeService;
+    }
 
     @GetMapping(value="/all")
     public List<ServiceTypeDTO> getAll() {
