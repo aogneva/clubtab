@@ -5,7 +5,6 @@ import ru.ogneva.clubtab.dto.ServiceTypeDTO;
 import ru.ogneva.clubtab.service.ServiceTypeService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/service-type")

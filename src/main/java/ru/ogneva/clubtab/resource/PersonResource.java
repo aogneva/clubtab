@@ -20,7 +20,7 @@ public class PersonResource {
     }
 
     @GetMapping(value="/all")
-    public List<PersonDTO> getALl() {
+    public List<PersonDTO> getAll() {
         return personService.getAll();
     }
 
@@ -49,7 +49,7 @@ public class PersonResource {
     }
 
     @PutMapping(value="/update")
-    public PersonDTO create(
+    public PersonDTO update(
             @RequestParam("id") Long id,
             @RequestParam("firstName") String firstName,
             @RequestParam("secondName") String secondName,
