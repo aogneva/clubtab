@@ -69,8 +69,8 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("POST create person")
     void create() throws Exception {
-        Date date = new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime();
-        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина", date);
+        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина",
+                new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
         Mockito.when(personService.save(Mockito.any())).thenReturn(person);
         mvc.perform(MockMvcRequestBuilders.post("/person")
                         .contentType(MediaType.APPLICATION_JSON)

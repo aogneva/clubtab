@@ -14,11 +14,10 @@ import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
 import ru.ogneva.clubtab.service.PersonService;
 
-import javax.persistence.EntityNotFoundException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -58,7 +57,7 @@ class PersonIntegrityTest {
     }
 
     @Test
-    @DisplayName("GET one")
+    @DisplayName("GET all person")
     void getOneOk() throws Exception {
         PersonDTO p = createTestPerson("Елена",  "Максимовна", "Усова",
                 new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
@@ -68,35 +67,48 @@ class PersonIntegrityTest {
             .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
             .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
             .andExpect(jsonPath("$.lastName").value(p.getLastName()))
-            .andExpect(jsonPath("$.dob").value((new SimpleDateFormat("DD.MM.YYYY")).format(p.getDob())));
+        ;
     }
 
     @Test
-    @DisplayName("GET one not found")
+    @DisplayName("GET person not found")
     void getOneNotFound() throws Exception {
     }
 
     @Test
-    void create() {
+    @DisplayName("POST person")
+    void createTest() throws Exception {
+        GregorianCalendar gregorianDateTime = new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3);
+        gregorianDateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+        PersonDTO person = new PersonDTO( null, "Елена",  "Максимовна", "Усова",
+                gregorianDateTime.getTime());
+        mockMvc.perform(MockMvcRequestBuilders.post("/person/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(person))
+            )
+            .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
+                .andExpect(jsonPath("$.secondName").value(person.getSecondName()))
+                .andExpect(jsonPath("$.lastName").value(person.getLastName()))
+        ;
     }
 
     @Test
+    @DisplayName("PUT person")
     void update() throws Exception {
-//        PersonDTO pOld = createTestPerson("Елена",  "Максимовна", "Усова",
-//            new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
-//        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова",
-//                new GregorianCalendar(1987, GregorianCalendar.APRIL, 4).getTime());
-//        mockMvc.perform(
-//            MockMvcRequestBuilders.put("/person/{id}", pOld.getId())
-//                    .content(objectMapper.writeValueAsString(pOld))
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    )
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(p.getId()))
-//                .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
-//                .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
-//                .andExpect(jsonPath("$.lastName").value(p.getLastName()))
-//                .andExpect(jsonPath("$.dob").value((new SimpleDateFormat("DD.MM.YYYY")).format(p.getDob())))
+        PersonDTO pOld = createTestPerson("Елена",  "Максимовна", "Усова",
+            new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова", pOld.getDob());
+        mockMvc.perform(
+            MockMvcRequestBuilders.put("/person/{id}", p.getId())
+                    .content(objectMapper.writeValueAsString(p))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(p.getId()))
+                .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
+                .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
+                .andExpect(jsonPath("$.lastName").value(p.getLastName()))
         ;
     }
 
