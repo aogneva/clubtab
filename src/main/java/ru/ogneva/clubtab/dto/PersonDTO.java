@@ -20,7 +20,7 @@ public class PersonDTO implements Serializable {
     private String firstName;
     private String secondName;
     private String lastName;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", locale = "ru-RU", timezone = "Asia/Yekaterinburg")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", locale = "ru-RU", timezone = "Asia/Yekaterinburg")
     private Date dob;
 
     public boolean equals(Object obj) {

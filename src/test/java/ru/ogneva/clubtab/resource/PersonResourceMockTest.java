@@ -15,10 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.service.PersonService;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -72,8 +69,8 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("POST create person")
     void create() throws Exception {
-        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина",
-                new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
+        Date date = new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime();
+        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина", date);
         Mockito.when(personService.save(Mockito.any())).thenReturn(person);
         mvc.perform(MockMvcRequestBuilders.post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
