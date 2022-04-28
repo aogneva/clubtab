@@ -27,10 +27,10 @@ public class PersonResource {
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<PersonDTO> getOne(@PathVariable("id") Long id) throws EntityNotFoundException {
+    public ResponseEntity<PersonDTO> getOne(@PathVariable("id") Long id) {
         Optional<PersonDTO> personDTO = personService.findOne(id);
         if (personDTO.isEmpty()) {
-            throw new EntityNotFoundException("id: "+id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok().body(personDTO.get());
     }
@@ -45,10 +45,10 @@ public class PersonResource {
     public ResponseEntity<PersonDTO> update(
             @PathVariable("id") Long id,
             @RequestBody PersonDTO personDTO
-    ) throws EntityNotFoundException {
+    ) {
         Optional<PersonDTO> p = personService.findOne(id);
         if (p.isEmpty()) {
-            throw new EntityNotFoundException("id: "+id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         if (!Objects.equals(personDTO.getId(), id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

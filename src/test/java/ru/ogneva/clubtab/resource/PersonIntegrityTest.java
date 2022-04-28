@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +58,7 @@ class PersonIntegrityTest {
     }
 
     @Test
-    @DisplayName("GET all person")
+    @DisplayName("GET person")
     void getOneOk() throws Exception {
         PersonDTO p = createTestPerson("Елена",  "Максимовна", "Усова",
                 new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
@@ -73,6 +74,9 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("GET person not found")
     void getOneNotFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/person/{id}", 0)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -108,8 +112,18 @@ class PersonIntegrityTest {
                 .andExpect(jsonPath("$.id").value(p.getId()))
                 .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
                 .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
-                .andExpect(jsonPath("$.lastName").value(p.getLastName()))
-        ;
+                .andExpect(jsonPath("$.lastName").value(p.getLastName()));
+    }
+
+    @Test
+    @DisplayName("PUT person not found")
+    void updateNotFound() throws Exception {
+        PersonDTO person = new PersonDTO(1L, "Елена",  "Максимовна", "Усова",
+                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        mockMvc.perform(MockMvcRequestBuilders.put("/person/{id}", 0)
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(person)))
+            .andExpect(status().isNotFound());
     }
 
     private PersonDTO createTestPerson(String firstName, String secondName, String lastName, Date date) {
