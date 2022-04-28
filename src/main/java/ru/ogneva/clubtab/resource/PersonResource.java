@@ -7,9 +7,6 @@ import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.service.PersonService;
 
 import javax.persistence.EntityNotFoundException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,7 +50,6 @@ public class PersonResource {
         if (p.isEmpty()) {
             throw new EntityNotFoundException("id: "+id);
         }
-        Date date;
         if (!Objects.equals(personDTO.getId(), id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

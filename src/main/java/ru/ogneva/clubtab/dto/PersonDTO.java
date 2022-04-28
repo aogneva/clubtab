@@ -1,20 +1,26 @@
 package ru.ogneva.clubtab.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class PersonDTO {
+public class PersonDTO implements Serializable {
+
+    private static final long serialVersionUID = -1052504454168250981L;
+
     private Long id;
     private String firstName;
     private String secondName;
     private String lastName;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", locale = "ru-RU", timezone = "Asia/Yekaterinburg")
     private Date dob;
 
     public boolean equals(Object obj) {
@@ -45,7 +51,10 @@ public class PersonDTO {
             return false;
         if (dob == null) {
             return other.dob == null;
-        } else return dob.equals(other.dob);
+        } else if (!dob.equals(other.dob)) {
+            return false;
+        }
+        return true;
     }
 
     public String toString() {
