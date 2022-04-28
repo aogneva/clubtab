@@ -49,8 +49,8 @@ class PersonResourceMockTest {
                 new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime()));
         personList.add( new PersonDTO(3L, "Александр", "Николаевич", "Веселов",
                 new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime()));
-        Mockito.when(personService.getAll()).thenReturn(personList);
-        mvc.perform(MockMvcRequestBuilders.get("/person/all"))
+        Mockito.when(personService.findAll()).thenReturn(personList);
+        mvc.perform(MockMvcRequestBuilders.get("/person"))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(personList)));
     }
@@ -60,7 +60,7 @@ class PersonResourceMockTest {
     void getOne() throws Exception {
         PersonDTO personDTO = new PersonDTO(3L, "Александр", "Николаевич", "Веселов",
                 new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
-        Mockito.when(personService.getOne(Mockito.anyLong())).thenReturn(Optional.of(personDTO));
+        Mockito.when(personService.findOne(Mockito.anyLong())).thenReturn(Optional.of(personDTO));
         mvc.perform(MockMvcRequestBuilders.get("/person/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
@@ -72,18 +72,17 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("POST create person")
     void create() throws Exception {
-        PersonDTO person = new PersonDTO(2L, "Светлана", "Васильевна", "Галкина",
+        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина",
                 new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
-        Mockito.when(personService.save(
-                Mockito.isNull(),Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-                .thenReturn(person);
-        mvc.perform(MockMvcRequestBuilders.post("/person/new")
-                        .param("firstName", "Светлана")
-                        .param("secondName", "Васильевна")
-                        .param("lastName", "Галкина")
-                        .param("dob", "07.09.1974")
+        Mockito.when(personService.save(Mockito.any())).thenReturn(person);
+        mvc.perform(MockMvcRequestBuilders.post("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(person))
                 )
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName").value("Светлана"))
+                .andExpect(jsonPath("$.secondName").value("Васильевна"))
+                .andExpect(jsonPath("$.lastName").value("Галкина"));
     }
 
     @Test
@@ -91,10 +90,9 @@ class PersonResourceMockTest {
     void update() throws Exception {
         PersonDTO person = new PersonDTO(2L, "Светлана", "Васильевна", "Галкина",
                 new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
-        Mockito.when(personService.save(Mockito.anyLong(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-                .thenReturn(person);
-        mvc.perform(MockMvcRequestBuilders.put("/person/update")
+        Mockito.when(personService.findOne(Mockito.anyLong())).thenReturn(Optional.of(person));
+        Mockito.when(personService.save(Mockito.any())).thenReturn(person);
+        mvc.perform(MockMvcRequestBuilders.put("/person/2")
                         .content(objectMapper.writeValueAsString(person))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

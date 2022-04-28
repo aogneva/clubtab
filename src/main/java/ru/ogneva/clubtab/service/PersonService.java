@@ -7,7 +7,6 @@ import ru.ogneva.clubtab.repository.PersonRepository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,14 +18,14 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public List<PersonDTO> getAll() {
+    public List<PersonDTO> findAll() {
         return personRepository.findAll()
                 .stream()
                 .map(PersonEntity::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<PersonDTO> getOne(Long id) {
+    public Optional<PersonDTO> findOne(Long id) {
         return personRepository.findById(id)
                 .map(PersonEntity::toDto);
     }
@@ -35,8 +34,8 @@ public class PersonService {
         personRepository.deleteById(id);
     }
 
-    public PersonDTO save(Long id, String firstName, String secondName, String lastName, Date dob) {
-        PersonEntity newPersonEntity = new PersonEntity(id, firstName, secondName, lastName, dob);
+    public PersonDTO save(PersonDTO personDTO) {
+        PersonEntity newPersonEntity = PersonEntity.toEntity(personDTO);
         PersonEntity personEntity = personRepository.save(newPersonEntity);
         return personEntity.toDto();
     }
