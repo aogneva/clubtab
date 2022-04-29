@@ -1,6 +1,11 @@
 package ru.ogneva.clubtab.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONAware;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,15 +15,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
 import ru.ogneva.clubtab.service.PersonService;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,9 +42,12 @@ class PersonIntegrityTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private final List<Long> toDeleteList = new ArrayList<>();
+
     @AfterEach
     void resetDb() {
-        personRepository.deleteAll();
+        toDeleteList.forEach(personId -> personRepository.deleteById(personId));
+        toDeleteList.clear();
     }
 
     @Test
@@ -53,8 +59,7 @@ class PersonIntegrityTest {
                 new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
         String arrStr = objectMapper.writeValueAsString(Arrays.asList(p1, p2));
         mockMvc.perform(MockMvcRequestBuilders.get("/person"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(arrStr));
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -86,7 +91,7 @@ class PersonIntegrityTest {
         gregorianDateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
         PersonDTO person = new PersonDTO( null, "Елена",  "Максимовна", "Усова",
                 gregorianDateTime.getTime());
-        mockMvc.perform(MockMvcRequestBuilders.post("/person/")
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/person")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(person))
             )
@@ -94,7 +99,11 @@ class PersonIntegrityTest {
                 .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
                 .andExpect(jsonPath("$.secondName").value(person.getSecondName()))
                 .andExpect(jsonPath("$.lastName").value(person.getLastName()))
-        ;
+                .andReturn();
+        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        if (id!=null) {
+            toDeleteList.add(id.longValue());
+        }
     }
 
     @Test
@@ -127,6 +136,8 @@ class PersonIntegrityTest {
     }
 
     private PersonDTO createTestPerson(String firstName, String secondName, String lastName, Date date) {
-        return personService.save(new PersonDTO(null, firstName, secondName, lastName, date));
+        PersonDTO person = personService.save(new PersonDTO(null, firstName, secondName, lastName, date));
+        toDeleteList.add(person.getId());
+        return person;
     }
 }
