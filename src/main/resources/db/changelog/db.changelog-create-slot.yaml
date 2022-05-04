@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-slot
+      author: anna_ogneva
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: slot
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: start_time
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: duration
+                  type: BIGINT
+              - column:
+                  constraints:
+                    foreignKeyName: fk_slot_service_type
+                    references: service_type(id)
+                  name: service_type_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    foreignKeyName: fk_slot_executor
+                    references: person(id)
+                  name: executor_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    foreignKeyName: fk_slot_state_type
+                    references: state_type(id)
+                  name: state_id
+                  type: BIGINT
+            tableName: slot
