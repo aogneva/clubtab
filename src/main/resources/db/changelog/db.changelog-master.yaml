@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/db.changelog-yaml-create-state-type.yaml
   - include:
       file: db/changelog/db.changelog-state-type-insert-20220504.yaml
+  - include:
+      file: db/changelog/db.changelog-update-person.yaml

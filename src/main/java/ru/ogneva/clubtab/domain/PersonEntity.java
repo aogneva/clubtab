@@ -34,12 +34,12 @@ public class PersonEntity {
     @NotNull
     private String lastName;
 
-    @Column(name="dob")
+    @Column(name="phone")
     @NotNull
-    private Date dob;
+    private String phone;
 
     public PersonDTO toDto() {
-        return new PersonDTO(id, firstName, secondName, lastName, dob);
+        return new PersonDTO(id, firstName, secondName, lastName, phone);
     }
 
     public static PersonEntity toEntity(PersonDTO personDTO) {
@@ -48,7 +48,7 @@ public class PersonEntity {
                 personDTO.getFirstName(),
                 personDTO.getSecondName(),
                 personDTO.getLastName(),
-                personDTO.getDob()
+                personDTO.getPhone()
         );
     }
 
@@ -78,13 +78,13 @@ public class PersonEntity {
                 return false;
         } else if (!lastName.equals(other.lastName))
             return false;
-        if (dob == null) {
-            return other.dob == null;
-        } else return dob.equals(other.dob);
+        if (phone == null) {
+            return other.phone == null;
+        } else return phone.equals(other.phone);
     }
 
     public String toString() {
         return String.format("%s %s %s (born: %s)",
-                lastName, firstName, secondName, new SimpleDateFormat("dd-MM-yyyy").format(dob));
+                lastName, firstName, secondName, new SimpleDateFormat("dd-MM-yyyy").format(phone));
     }
 }

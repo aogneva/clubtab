@@ -40,12 +40,9 @@ class PersonResourceMockTest {
     @DisplayName("GET all persons")
     void getAll() throws Exception {
         List<PersonDTO> personList = new ArrayList<>();
-        personList.add( new PersonDTO(1L, "Татьяна", "Степановна", "Даничкина",
-                new GregorianCalendar(1987, GregorianCalendar.APRIL, 14).getTime()));
-        personList.add( new PersonDTO(2L, "Светлана", "Васильевна", "Галкина",
-                new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime()));
-        personList.add( new PersonDTO(3L, "Александр", "Николаевич", "Веселов",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime()));
+        personList.add( new PersonDTO(1L, "Татьяна", "Степановна", "Даничкина", "9124578274"));
+        personList.add( new PersonDTO(2L, "Светлана", "Васильевна", "Галкина", "9124578277"));
+        personList.add( new PersonDTO(3L, "Александр", "Николаевич", "Веселов", "9124578278"));
         Mockito.when(personService.findAll()).thenReturn(personList);
         mvc.perform(MockMvcRequestBuilders.get("/person"))
             .andExpect(status().isOk())
@@ -55,8 +52,7 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("GET one person")
     void getOne() throws Exception {
-        PersonDTO personDTO = new PersonDTO(3L, "Александр", "Николаевич", "Веселов",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        PersonDTO personDTO = new PersonDTO(3L, "Александр", "Николаевич", "Веселов","9124578273");
         Mockito.when(personService.findOne(Mockito.anyLong())).thenReturn(Optional.of(personDTO));
         mvc.perform(MockMvcRequestBuilders.get("/person/3"))
                 .andExpect(status().isOk())
@@ -69,8 +65,7 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("POST create person")
     void create() throws Exception {
-        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина",
-                new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
+        PersonDTO person = new PersonDTO(null, "Светлана", "Васильевна", "Галкина", "9124578270");
         Mockito.when(personService.save(Mockito.any())).thenReturn(person);
         mvc.perform(MockMvcRequestBuilders.post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,8 +80,7 @@ class PersonResourceMockTest {
     @Test
     @DisplayName("PUT update person")
     void update() throws Exception {
-        PersonDTO person = new PersonDTO(2L, "Светлана", "Васильевна", "Галкина",
-                new GregorianCalendar(1974, GregorianCalendar.SEPTEMBER, 7).getTime());
+        PersonDTO person = new PersonDTO(2L, "Светлана", "Васильевна", "Галкина", "9124578271");
         Mockito.when(personService.findOne(Mockito.anyLong())).thenReturn(Optional.of(person));
         Mockito.when(personService.save(Mockito.any())).thenReturn(person);
         mvc.perform(MockMvcRequestBuilders.put("/person/2")

@@ -53,10 +53,8 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("GET all")
     void getAll() throws Exception {
-        PersonDTO p1 = createTestPerson("Игорь", "Николаевич", "Титов",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
-        PersonDTO p2 = createTestPerson("Елена",  "Максимовна", "Усова",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        PersonDTO p1 = createTestPerson("Игорь", "Николаевич", "Титов", "9921345675");
+        PersonDTO p2 = createTestPerson("Елена",  "Максимовна", "Усова", "9124578274");
         String arrStr = objectMapper.writeValueAsString(Arrays.asList(p1, p2));
         mockMvc.perform(MockMvcRequestBuilders.get("/person"))
             .andExpect(status().isOk());
@@ -65,8 +63,7 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("GET person")
     void getOneOk() throws Exception {
-        PersonDTO p = createTestPerson("Елена",  "Максимовна", "Усова",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        PersonDTO p = createTestPerson("Елена",  "Максимовна", "Усова","9124578274");
         mockMvc.perform(MockMvcRequestBuilders.get("/person/{id}", p.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(p.getId()))
@@ -87,10 +84,7 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("POST person")
     void createTest() throws Exception {
-        GregorianCalendar gregorianDateTime = new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3);
-        gregorianDateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
-        PersonDTO person = new PersonDTO( null, "Елена",  "Максимовна", "Усова",
-                gregorianDateTime.getTime());
+        PersonDTO person = new PersonDTO( null, "Елена",  "Максимовна", "Усова","9124578274");
         MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/person")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(person))
@@ -109,9 +103,8 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("PUT person")
     void update() throws Exception {
-        PersonDTO pOld = createTestPerson("Елена",  "Максимовна", "Усова",
-            new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
-        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова", pOld.getDob());
+        PersonDTO pOld = createTestPerson("Елена",  "Максимовна", "Усова","9124578274");
+        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова", "9124578274");
         mockMvc.perform(
             MockMvcRequestBuilders.put("/person/{id}", p.getId())
                     .content(objectMapper.writeValueAsString(p))
@@ -127,16 +120,15 @@ class PersonIntegrityTest {
     @Test
     @DisplayName("PUT person not found")
     void updateNotFound() throws Exception {
-        PersonDTO person = new PersonDTO(1L, "Елена",  "Максимовна", "Усова",
-                new GregorianCalendar(1990, GregorianCalendar.JANUARY, 3).getTime());
+        PersonDTO person = new PersonDTO(1L, "Елена",  "Максимовна", "Усова", "9124578274");
         mockMvc.perform(MockMvcRequestBuilders.put("/person/{id}", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(person)))
             .andExpect(status().isNotFound());
     }
 
-    private PersonDTO createTestPerson(String firstName, String secondName, String lastName, Date date) {
-        PersonDTO person = personService.save(new PersonDTO(null, firstName, secondName, lastName, date));
+    private PersonDTO createTestPerson(String firstName, String secondName, String lastName, String phone) {
+        PersonDTO person = personService.save(new PersonDTO(null, firstName, secondName, lastName, phone));
         toDeleteList.add(person.getId());
         return person;
     }

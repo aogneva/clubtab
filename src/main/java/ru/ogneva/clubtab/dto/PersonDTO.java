@@ -20,8 +20,7 @@ public class PersonDTO implements Serializable {
     private String firstName;
     private String secondName;
     private String lastName;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy", locale = "ru-RU", timezone = "Asia/Yekaterinburg")
-    private Date dob;
+    private String phone;
 
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -49,9 +48,9 @@ public class PersonDTO implements Serializable {
                 return false;
         } else if (!lastName.equals(other.lastName))
             return false;
-        if (dob == null) {
-            return other.dob == null;
-        } else if (!dob.equals(other.dob)) {
+        if (phone == null) {
+            return other.phone == null;
+        } else if (!phone.equals(other.phone)) {
             return false;
         }
         return true;
@@ -59,6 +58,6 @@ public class PersonDTO implements Serializable {
 
     public String toString() {
         return String.format("%s %s %s (born: %s)",
-                lastName, firstName, secondName, new SimpleDateFormat("dd-MM-yyyy").format(dob));
+                lastName, firstName, secondName, new SimpleDateFormat("dd-MM-yyyy").format(phone));
     }
 }

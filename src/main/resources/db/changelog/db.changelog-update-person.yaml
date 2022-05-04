@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-person
+      author: anna_ogneva
+      preConditions:
+        - onFail: MARK_RAN
+          tableExists:
+            tableName: person
+      changes:
+        - dropColumn:
+            columns:
+              - column:
+                  name: dob
+            tableName: person
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: phone
+                  type: VARCHAR(255)
+            tableName: person
