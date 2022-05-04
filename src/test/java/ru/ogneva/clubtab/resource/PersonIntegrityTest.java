@@ -70,6 +70,7 @@ class PersonIntegrityTest {
             .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
             .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
             .andExpect(jsonPath("$.lastName").value(p.getLastName()))
+            .andExpect(jsonPath("$.phone").value(p.getPhone()))
         ;
     }
 
@@ -93,6 +94,7 @@ class PersonIntegrityTest {
                 .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
                 .andExpect(jsonPath("$.secondName").value(person.getSecondName()))
                 .andExpect(jsonPath("$.lastName").value(person.getLastName()))
+                .andExpect(jsonPath("$.phone").value(person.getPhone()))
                 .andReturn();
         Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
         if (id!=null) {
@@ -104,7 +106,7 @@ class PersonIntegrityTest {
     @DisplayName("PUT person")
     void update() throws Exception {
         PersonDTO pOld = createTestPerson("Елена",  "Максимовна", "Усова","9124578274");
-        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова", "9124578274");
+        PersonDTO p = new PersonDTO(pOld.getId(), pOld.getFirstName(), pOld.getSecondName(), "Швецова", "9091645187");
         mockMvc.perform(
             MockMvcRequestBuilders.put("/person/{id}", p.getId())
                     .content(objectMapper.writeValueAsString(p))
@@ -114,7 +116,8 @@ class PersonIntegrityTest {
                 .andExpect(jsonPath("$.id").value(p.getId()))
                 .andExpect(jsonPath("$.firstName").value(p.getFirstName()))
                 .andExpect(jsonPath("$.secondName").value(p.getSecondName()))
-                .andExpect(jsonPath("$.lastName").value(p.getLastName()));
+                .andExpect(jsonPath("$.lastName").value(p.getLastName()))
+                .andExpect(jsonPath("$.phone").value(p.getPhone()));
     }
 
     @Test
