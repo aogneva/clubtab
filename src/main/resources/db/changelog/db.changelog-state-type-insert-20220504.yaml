@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: state-type-insert
+      author: anna_ogneva
+      changes:
+        - sql:
+            sql: insert into state_type (id, name, tag, gist) values (1, 'Назначено', 'STATE_SCHEDULED', 'SLOT')
+        - sql:
+            sql: insert into state_type (id, name, tag, gist) values (2, 'Отменено', 'STATE_CANCELED', 'SLOT')
+        - sql:
+            sql: insert into state_type (id, name, tag, gist) values (3, 'Выполнено', 'STATE_COMPLETED', 'SLOT')

@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-state-type
+      author: anna_ogneva
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: state_type
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: tag
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: gist
+                  type: VARCHAR(255)
+            tableName: state_type
