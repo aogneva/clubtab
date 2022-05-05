@@ -1,6 +1,7 @@
 package ru.ogneva.clubtab.service;
 
 import org.springframework.stereotype.Service;
+import ru.ogneva.clubtab.domain.ServiceTypeEntity;
 import ru.ogneva.clubtab.domain.SlotEntity;
 import ru.ogneva.clubtab.dto.SlotDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
@@ -45,13 +46,14 @@ public class SlotService {
         slotRepository.deleteById(id);
     }
 
-    public SlotDTO create(SlotDTO slotDTO) throws Exception {
-        if (Objects.nonNull(slotDTO.getId())) {
-            throw new Exception("Идентификатор нового объекта не null");
-        }
+    public SlotDTO create(SlotDTO slotDTO) {
         SlotEntity entity = SlotEntity.toEntity(slotDTO);
-        entity.setServiceType(slotDTO.getServiceTypeId()==null ? null :
-                serviceTypeRepository.findById(slotDTO.getServiceTypeId()).orElse(null));
+        ServiceTypeEntity serviceType = slotDTO.getServiceTypeId()==null ? null :
+                serviceTypeRepository.findById(slotDTO.getServiceTypeId()).orElse(null);
+        if (slotDTO.getDuration() == null && serviceType!=null) {
+            entity.setDuration(serviceType.getDuration());
+        }
+        entity.setServiceType(serviceType);
         entity.setState(slotDTO.getStateId()==null ? null :
                 stateTypeRepository.findById(slotDTO.getStateId()).orElse(null));
         entity.setExecutor(slotDTO.getExecutorId()==null ? null :

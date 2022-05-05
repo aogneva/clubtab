@@ -94,11 +94,11 @@ class PersonIntegrityTest {
                 .content(objectMapper.writeValueAsString(person))
             )
             .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
-                .andExpect(jsonPath("$.secondName").value(person.getSecondName()))
-                .andExpect(jsonPath("$.lastName").value(person.getLastName()))
-                .andExpect(jsonPath("$.phone").value(person.getPhone()))
-                .andReturn();
+            .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
+            .andExpect(jsonPath("$.secondName").value(person.getSecondName()))
+            .andExpect(jsonPath("$.lastName").value(person.getLastName()))
+            .andExpect(jsonPath("$.phone").value(person.getPhone()))
+            .andReturn();
         Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
         if (id!=null) {
             toDeleteList.add(id.longValue());

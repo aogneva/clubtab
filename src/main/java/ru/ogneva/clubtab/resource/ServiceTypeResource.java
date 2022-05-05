@@ -1,10 +1,13 @@
 package ru.ogneva.clubtab.resource;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ogneva.clubtab.dto.ServiceTypeDTO;
 import ru.ogneva.clubtab.service.ServiceTypeService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/service-type")
@@ -21,8 +24,12 @@ public class ServiceTypeResource {
     }
 
     @GetMapping(value="/{id}")
-    public ServiceTypeDTO get(@PathVariable("id") Long id) {
-        return serviceTypeService.get(id).orElse(null);
+    public ResponseEntity<ServiceTypeDTO> get(@PathVariable("id") Long id) {
+        Optional<ServiceTypeDTO> dto = serviceTypeService.get(id);
+        if(dto.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok().body(dto.get());
     }
 
 }

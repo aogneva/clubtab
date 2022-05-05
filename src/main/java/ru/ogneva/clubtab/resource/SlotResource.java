@@ -2,10 +2,7 @@ package ru.ogneva.clubtab.resource;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.ogneva.clubtab.dto.SlotDTO;
 import ru.ogneva.clubtab.service.SlotService;
 
@@ -38,4 +35,17 @@ public class SlotResource {
                 ResponseEntity.status(HttpStatus.OK)
                 .body(dto.get());
     }
+
+    @PostMapping
+    public ResponseEntity<SlotDTO> create(@RequestBody SlotDTO slotDTO) {
+        if (Objects.nonNull(slotDTO.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        SlotDTO slot = slotService.create(slotDTO);
+        if (Objects.isNull(slot)) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(slot);
+    }
+
 }

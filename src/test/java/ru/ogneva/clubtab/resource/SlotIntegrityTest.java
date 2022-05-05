@@ -1,11 +1,16 @@
 package ru.ogneva.clubtab.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.event.annotation.AfterTestClass;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.ogneva.clubtab.dto.PersonDTO;
 import ru.ogneva.clubtab.dto.SlotDTO;
@@ -17,6 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -36,7 +42,7 @@ class SlotIntegrityTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private PersonDTO executor;
+    static private PersonDTO executor;
 
     final private List<Long> toDeleteList = new ArrayList<>();
 
@@ -56,34 +62,46 @@ class SlotIntegrityTest {
     @Test
     @DisplayName("GET all")
     void getAll() throws Exception {
-        SlotDTO slot = createTestEntity();
         mockMvc.perform(MockMvcRequestBuilders.get("/slot"))
                 .andExpect(status().isOk());
     }
 
-    private SlotDTO createTestEntity() {
-        try {
-            SlotDTO slot = slotService.create(
-                SlotDTO.builder()
-                    .id(null)
-                    .duration(60L)
-                    .startTime(
-                        new GregorianCalendar(
-                            2022,
-                            GregorianCalendar.MAY,
-                            12).toInstant()
-                    )
-                    .stateId(1L)
-                    .executorId(executor!=null ? executor.getId() : null)
-                    .serviceTypeId(5L)
-                .build());
-            if(Objects.nonNull(slot)) {
-                toDeleteList.add(slot.getId());
-            }
-            return slot;
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-            return null;
+    @Test
+    @DisplayName("POST create slot")
+    void create() throws Exception {
+        SlotDTO dto = createTestDto();
+
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/slot")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+            )
+            .andExpectAll(status().isCreated(),
+                jsonPath("$.duration").value(dto.getDuration()),
+                jsonPath("$.stateId").value(dto.getStateId()),
+                jsonPath("$.serviceTypeId").value(dto.getServiceTypeId()),
+                jsonPath("$.executorId").value(dto.getExecutorId())
+            )
+            .andReturn();
+        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        if (id!=null) {
+            toDeleteList.add(id.longValue());
         }
+
+    }
+
+    private SlotDTO createTestDto() {
+        return SlotDTO.builder()
+                .id(null)
+                .duration(60L)
+                .startTime(
+                        new GregorianCalendar(
+                                2022,
+                                GregorianCalendar.MAY,
+                                12).toInstant()
+                )
+                .stateId(1L)
+                .executorId(executor!=null ? executor.getId() : null)
+                .serviceTypeId(5L)
+                .build();
     }
 }

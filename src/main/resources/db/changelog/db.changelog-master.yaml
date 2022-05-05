@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/db.changelog-update-person.yaml
   - include:
       file: db/changelog/db.changelog-create-slot.yaml
+  - include:
+      file: db/changelog/db.changelog-update-service-type-20220505.yaml

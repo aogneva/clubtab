@@ -17,4 +17,5 @@ public class ServiceTypeDTO {
     private String name;
     private String tag;
     private String gist;
+    private Long duration;
 }

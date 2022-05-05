@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: service-type-modify-20220505-1358
+      author: anna_ogneva
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: duration
+                  type: BIGINT
+                  defaultValue: 60
+            tableName: service_type

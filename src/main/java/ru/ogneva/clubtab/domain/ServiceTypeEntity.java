@@ -34,10 +34,12 @@ public class ServiceTypeEntity {
     @NotNull
     private String gist;
 
-    //TODO: длительность услуги по умолчанию
+    @Column(name="duration")
+    @NotNull
+    private Long duration;
 
     public ServiceTypeDTO toDto() {
-        return new ServiceTypeDTO(id, name, tag, gist);
+        return new ServiceTypeDTO(id, name, tag, gist, duration);
     }
 
     public static ServiceTypeEntity toEntity(ServiceTypeDTO serviceTypeDTO) {
@@ -45,7 +47,8 @@ public class ServiceTypeEntity {
                 serviceTypeDTO.getId(),
                 serviceTypeDTO.getName(),
                 serviceTypeDTO.getTag(),
-                serviceTypeDTO.getGist()
+                serviceTypeDTO.getGist(),
+                serviceTypeDTO.getDuration()
         );
     }
 
@@ -70,6 +73,11 @@ public class ServiceTypeEntity {
                 return false;
         } else if (!tag.equals(other.tag))
             return false;
+        if (duration == null) {
+            if (other.getDuration() != null)
+                return false;
+        } else if (!duration.equals(other.duration))
+            return false;
         if (gist == null && other.getGist() != null) {
             return false;
         }
@@ -77,8 +85,8 @@ public class ServiceTypeEntity {
     }
 
     public String toString() {
-        return String.format("%d %s %s %s",
-                id, name, tag, gist);
+        return String.format("%d %s %s %s %d",
+                id, name, tag, gist, duration);
     }
 
 }
