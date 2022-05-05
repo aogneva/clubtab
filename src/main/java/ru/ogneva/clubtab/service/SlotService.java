@@ -62,15 +62,13 @@ public class SlotService {
     }
 
     public SlotDTO update(SlotDTO slotDTO) throws InstanceNotFoundException {
-        if (Objects.isNull(slotDTO.getId())) {
-            throw new InstanceNotFoundException();
-        }
-        Optional<SlotEntity> slotEntity = slotRepository.findById(slotDTO.getId());
-        if (slotEntity.isEmpty()) {
-            throw new InstanceNotFoundException();
-        }
-        slotEntity.get().setDuration(slotDTO.getDuration());
-        slotEntity.get().setStartTime(slotDTO.getStartTime());
-        return slotRepository.save(slotEntity.get()).toDto();
+        SlotEntity slotEntity = slotRepository.findById(slotDTO.getId())
+                .orElseThrow(InstanceNotFoundException::new);
+        slotEntity.setDuration(slotDTO.getDuration());
+        slotEntity.setStartTime(slotDTO.getStartTime());
+        slotEntity.setServiceType(serviceTypeRepository.findById(slotDTO.getServiceTypeId()).orElse(null));
+        slotEntity.setState(stateTypeRepository.findById(slotDTO.getStateId()).orElse(null));
+        slotEntity.setExecutor(personRepository.findById(slotDTO.getExecutorId()).orElse(null));
+        return slotRepository.save(slotEntity).toDto();
     }
 }

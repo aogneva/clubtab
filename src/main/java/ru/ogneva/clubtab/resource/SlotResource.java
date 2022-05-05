@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ogneva.clubtab.dto.SlotDTO;
 import ru.ogneva.clubtab.service.SlotService;
 
+import javax.management.InstanceNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +47,20 @@ public class SlotResource {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(slot);
+    }
+
+    @PutMapping
+    public ResponseEntity<SlotDTO> update(@RequestBody SlotDTO slotDTO) {
+        if (Objects.isNull(slotDTO.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        SlotDTO slot;
+        try {
+            slot = slotService.update(slotDTO);
+        } catch (InstanceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok().body(slot);
     }
 
 }

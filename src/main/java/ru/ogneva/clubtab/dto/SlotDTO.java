@@ -26,7 +26,17 @@ public class SlotDTO implements Serializable {
     private Long executorId;
     private Long stateId;
 
-
+    @Override
+    public SlotDTO clone(){
+        return SlotDTO.builder()
+                .id(id)
+                .startTime(startTime)
+                .duration(duration)
+                .serviceTypeId(serviceTypeId)
+                .executorId(executorId)
+                .stateId(stateId)
+                .build();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
