@@ -29,7 +29,7 @@ public class PersonService {
                 .map(PersonEntity::toDto);
     }
 
-    public void deleteOne(Long id) {
+    public void delete(Long id) {
         personRepository.deleteById(id);
     }
 

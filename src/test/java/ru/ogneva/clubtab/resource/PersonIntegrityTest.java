@@ -2,10 +2,6 @@ package ru.ogneva.clubtab.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONAware;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,6 +44,13 @@ class PersonIntegrityTest {
     void resetDb() {
         toDeleteList.forEach(personId -> personRepository.deleteById(personId));
         toDeleteList.clear();
+    }
+
+    @Test
+    @DisplayName("GET all slots")
+    void getAllSlots() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot"))
+                .andExpect(status().isOk());
     }
 
     @Test

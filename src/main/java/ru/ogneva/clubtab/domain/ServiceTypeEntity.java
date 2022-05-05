@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import ru.ogneva.clubtab.dto.ServiceTypeDTO;
 
 import javax.persistence.*;
-import java.text.SimpleDateFormat;
 
 @Data
 @Builder
@@ -34,6 +33,8 @@ public class ServiceTypeEntity {
     @Column(name="gist")
     @NotNull
     private String gist;
+
+    //TODO: длительность услуги по умолчанию
 
     public ServiceTypeDTO toDto() {
         return new ServiceTypeDTO(id, name, tag, gist);
