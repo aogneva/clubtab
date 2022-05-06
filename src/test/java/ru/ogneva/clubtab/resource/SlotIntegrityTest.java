@@ -88,7 +88,7 @@ class SlotIntegrityTest {
     void getOne() throws Exception {
         ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_MASSAGE).orElseThrow();
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
-        SlotEntity dto = new SlotEntity(null, Instant.now(), 30L, serviceType, executor, state);
+        SlotEntity dto = new SlotEntity(null, Instant.now(), 30L, serviceType.getCapacity(), serviceType, executor, state);
         dto = slotRepository.save(dto);
         if (dto.getId()!=null) {
             toDeleteList.add(dto.getId());
@@ -98,6 +98,7 @@ class SlotIntegrityTest {
             )
             .andExpectAll(status().isOk(),
                 jsonPath("$.duration").value(dto.getDuration()),
+                jsonPath("$.availableSeats").value(serviceType.getCapacity()),
                 jsonPath("$.stateId").value(state.getId()),
                 jsonPath("$.serviceTypeId").value(dto.getServiceType().getId()),
                 jsonPath("$.executorId").value(dto.getExecutor().getId())
@@ -111,8 +112,7 @@ class SlotIntegrityTest {
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
         ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_PILLING).orElseThrow();
         SlotDTO dto = SlotDTO.builder()
-                .id(null)
-                .duration(null) /* !! check duration setting default */
+                .availableSeats(15)
                 .startTime(new GregorianCalendar(2022,GregorianCalendar.MAY,12).toInstant())
                 .stateId(state.getId())
                 .executorId(executor!=null ? executor.getId() : null)
@@ -126,13 +126,15 @@ class SlotIntegrityTest {
             .andExpectAll(status().isCreated(),
                 jsonPath("$.id").isNotEmpty(),
                 jsonPath("$.duration").value(serviceType.getDuration()), /* !! check duration setting default */
+                jsonPath("$.availableSeats").value(dto.getAvailableSeats()), /* !! check duration setting default */
                 jsonPath("$.stateId").value(dto.getStateId()),
                 jsonPath("$.serviceTypeId").value(dto.getServiceTypeId()),
                 jsonPath("$.executorId").value(dto.getExecutorId())
             )
             .andReturn();
-        Long id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
         assertThat(id, is(notNullValue()));
+        assertThat(id.longValue(), is(notNullValue()));
         toDeleteList.add(id.longValue());
         //---------------------
         SlotDTO updateDto = dto.clone();
@@ -156,51 +158,5 @@ class SlotIntegrityTest {
                         jsonPath("$.executorId").value(updateDto.getExecutorId())
                 );
     }
-
-    @Test
-    @Disabled
-    @DisplayName("PUT slot")
-    void updateSlot() throws Exception {
-        ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_MASSAGE).orElseThrow();
-        StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
-        SlotDTO dto = SlotDTO.builder()
-                .id(null)
-                .duration(null)
-                .startTime(new GregorianCalendar(2022,GregorianCalendar.MAY,12).toInstant())
-                .stateId(state.getId())
-                .executorId(null)
-                .serviceTypeId(serviceType.getId())
-                .build();
-        SlotDTO updateDto = slotService.create(dto);
-        if (updateDto!=null) {
-            toDeleteList.add(updateDto.getId());
-        }
-        ServiceTypeEntity newServiceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_PILLING).orElseThrow();
-        StateTypeEntity newState = stateTypeRepository.findByTag(Constants.StateTypes.STATE_COMPLETED).orElseThrow();
-        updateDto.setDuration(90L);
-        updateDto.setExecutorId(executor.getId());
-        updateDto.setStartTime(dto.getStartTime().minusSeconds(30L));
-        updateDto.setServiceTypeId(newServiceType.getId());
-        updateDto.setStateId(newState.getId());
-
-        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.put("/slot")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto))
-                )
-                .andExpectAll(status().isOk(),
-                        jsonPath("$.id").value(updateDto.getId()),
-                        jsonPath("$.duration").value(updateDto.getDuration()),
-                        jsonPath("$.stateId").value(updateDto.getStateId()),
-                        jsonPath("$.serviceTypeId").value(updateDto.getServiceTypeId()),
-                        jsonPath("$.executorId").value(updateDto.getExecutorId())
-                )
-                .andReturn();
-        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
-        if (id!=null) {
-            toDeleteList.add(id.longValue());
-        }
-
-    }
-
 
 }

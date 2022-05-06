@@ -11,7 +11,6 @@ import ru.ogneva.clubtab.repository.StateTypeRepository;
 
 import javax.management.InstanceNotFoundException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,6 +52,9 @@ public class SlotService {
         if (slotDTO.getDuration() == null && serviceType!=null) {
             entity.setDuration(serviceType.getDuration());
         }
+        if (slotDTO.getAvailableSeats() == null && serviceType!=null) {
+            entity.setAvailableSeats(serviceType.getCapacity());
+        }
         entity.setServiceType(serviceType);
         entity.setState(slotDTO.getStateId()==null ? null :
                 stateTypeRepository.findById(slotDTO.getStateId()).orElse(null));
@@ -65,6 +67,7 @@ public class SlotService {
         SlotEntity slotEntity = slotRepository.findById(slotDTO.getId())
                 .orElseThrow(InstanceNotFoundException::new);
         slotEntity.setDuration(slotDTO.getDuration());
+        // !! slotEntity.setAvailableSeats(slotDTO.getAvailableSeats());
         slotEntity.setStartTime(slotDTO.getStartTime());
         slotEntity.setServiceType(serviceTypeRepository.findById(slotDTO.getServiceTypeId()).orElse(null));
         slotEntity.setState(stateTypeRepository.findById(slotDTO.getStateId()).orElse(null));

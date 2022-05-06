@@ -32,6 +32,9 @@ public class SlotEntity {
     @Column(name ="duration")
     private Long duration;
 
+    @Column(name = "available_seats")
+    private Integer availableSeats;
+
     @JoinColumn(name="service_type_id")
     @ManyToOne(targetEntity = ServiceTypeEntity.class)
     private ServiceTypeEntity serviceType;
@@ -49,6 +52,7 @@ public class SlotEntity {
                 .id(id)
                 .startTime(startTime)
                 .duration(duration)
+                .availableSeats(availableSeats)
                 .serviceTypeId(serviceType == null ? null : serviceType.getId())
                 .executorId(executor == null ? null : executor.getId())
                 .stateId(state == null ? null : state.getId())
@@ -59,6 +63,7 @@ public class SlotEntity {
         return SlotEntity.builder()
             .id(slotDTO.getId())
             .duration(slotDTO.getDuration())
+            .availableSeats(slotDTO.getAvailableSeats())
             .startTime(slotDTO.getStartTime())
             .build();
     }
@@ -68,12 +73,18 @@ public class SlotEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SlotEntity that = (SlotEntity) o;
-        return id.equals(that.id) && startTime.equals(that.startTime) && duration.equals(that.duration) && Objects.equals(serviceType, that.serviceType) && Objects.equals(executor, that.executor) && Objects.equals(state, that.state);
+        return id.equals(that.id)
+                && startTime.equals(that.startTime)
+                && duration.equals(that.duration)
+                && availableSeats.equals(that.availableSeats)
+                && Objects.equals(serviceType, that.serviceType)
+                && Objects.equals(executor, that.executor)
+                && Objects.equals(state, that.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startTime, duration, serviceType, executor, state);
+        return Objects.hash(id, startTime, duration, availableSeats, serviceType, executor, state);
     }
 
     @Override
@@ -82,6 +93,7 @@ public class SlotEntity {
                 "id=" + id +
                 ", startTime=" + startTime +
                 ", duration=" + duration +
+                ", availableSeats=" + availableSeats +
                 ", serviceType=" + serviceType +
                 ", executor=" + executor +
                 ", state=" + state +

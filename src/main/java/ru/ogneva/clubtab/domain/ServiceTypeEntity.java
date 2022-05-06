@@ -38,8 +38,12 @@ public class ServiceTypeEntity {
     @NotNull
     private Long duration;
 
+    @Column(name="capacity")
+    @NotNull
+    private Integer capacity;
+
     public ServiceTypeDTO toDto() {
-        return new ServiceTypeDTO(id, name, tag, gist, duration);
+        return new ServiceTypeDTO(id, name, tag, gist, duration, capacity);
     }
 
     public static ServiceTypeEntity toEntity(ServiceTypeDTO serviceTypeDTO) {
@@ -48,7 +52,8 @@ public class ServiceTypeEntity {
                 serviceTypeDTO.getName(),
                 serviceTypeDTO.getTag(),
                 serviceTypeDTO.getGist(),
-                serviceTypeDTO.getDuration()
+                serviceTypeDTO.getDuration(),
+                serviceTypeDTO.getCapacity()
         );
     }
 

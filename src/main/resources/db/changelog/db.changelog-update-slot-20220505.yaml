@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: slot-modify-20220505-1907
+      author: anna_ogneva
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: available_seats
+                  type: NUMERIC
+                  defaultValue: 0
+            tableName: slot

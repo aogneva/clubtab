@@ -12,3 +12,23 @@ databaseChangeLog:
                   type: BIGINT
                   defaultValue: 60
             tableName: service_type
+  - changeSet:
+      id: service-type-modify-20220505-1845
+      author: anna_ogneva
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: capacity
+                  type: NUMERIC
+                  defaultValue: 1
+            tableName: service_type
+  - changeSet:
+      id: service-type-modify-20220505-1856
+      author: anna_ogneva
+      changes:
+        - sql:
+            sql:
+              update service_type set capacity = 10 where tag in ('GROUP_PILATES',  'GROUP_HATHA_I', 'GROUP_HATHA_II');
