@@ -88,20 +88,20 @@ class SlotIntegrityTest {
     void getOne() throws Exception {
         ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_MASSAGE).orElseThrow();
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
-        SlotEntity dto = new SlotEntity(null, Instant.now(), 30L, serviceType.getCapacity(), serviceType, executor, state, null);
-        dto = slotRepository.save(dto);
-        if (dto.getId()!=null) {
-            toDeleteList.add(dto.getId());
+        SlotEntity slot = new SlotEntity(null, Instant.now(), 30L, serviceType.getCapacity(), serviceType, executor, state, null);
+        slot = slotRepository.save(slot);
+        if (slot.getId()!=null) {
+            toDeleteList.add(slot.getId());
         }
 
-        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", dto.getId())
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", slot.getId())
             )
             .andExpectAll(status().isOk(),
-                jsonPath("$.duration").value(dto.getDuration()),
+                jsonPath("$.duration").value(slot.getDuration()),
                 jsonPath("$.availableSeats").value(serviceType.getCapacity()),
                 jsonPath("$.stateId").value(state.getId()),
-                jsonPath("$.serviceTypeId").value(dto.getServiceType().getId()),
-                jsonPath("$.executorId").value(dto.getExecutor().getId())
+                jsonPath("$.serviceTypeId").value(slot.getServiceType().getId()),
+                jsonPath("$.executorId").value(slot.getExecutor().getId())
             )
             .andReturn();
     }

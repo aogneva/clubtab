@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.ogneva.clubtab.dto.SlotDTO;
+import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -73,7 +74,7 @@ public class SlotEntity {
             null,
             null,
             null,
-            new ArrayList<>());
+            null);
     }
 
     @Override

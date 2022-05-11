@@ -53,7 +53,7 @@ public class PersonEntity {
                 personDTO.getSecondName(),
                 personDTO.getLastName(),
                 personDTO.getPhone(),
-                new ArrayList<>()
+                null
         );
     }
 

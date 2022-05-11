@@ -1,0 +1,75 @@
+package ru.ogneva.clubtab.service;
+
+import org.springframework.stereotype.Service;
+import ru.ogneva.clubtab.domain.PersonEntity;
+import ru.ogneva.clubtab.domain.SlotEntity;
+import ru.ogneva.clubtab.domain.SlotRegistrationEntity;
+import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
+import ru.ogneva.clubtab.repository.PersonRepository;
+import ru.ogneva.clubtab.repository.SlotRegistrationRepository;
+import ru.ogneva.clubtab.repository.SlotRepository;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+public class SlotRegistrationService {
+
+    private final SlotRepository slotRepository;
+
+    private final PersonRepository personRepository;
+    private final SlotRegistrationRepository slotRegistrationRepository;
+
+    SlotRegistrationService(
+            final SlotRepository slotRepository,
+            final PersonRepository personRepository,
+            final SlotRegistrationRepository slotRegistrationRepository) {
+        this.slotRepository = slotRepository;
+        this.personRepository = personRepository;
+        this.slotRegistrationRepository = slotRegistrationRepository;
+    }
+
+    public List<SlotRegistrationDTO> findAll() {
+        return slotRegistrationRepository.findAll().stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
+    }
+
+    public SlotRegistrationDTO create(Long slotId, Long customerId)
+            throws IllegalArgumentException, NoSuchElementException {
+        if (Objects.isNull(slotId) || Objects.isNull(customerId)) {
+            throw new IllegalArgumentException();
+        }
+
+        SlotEntity slot = slotRepository.findById(slotId).orElseThrow(() -> new NoSuchElementException());
+        PersonEntity customer = personRepository.findById(customerId).orElseThrow(() -> new NoSuchElementException());
+
+        return slotRegistrationRepository.save(
+            SlotRegistrationEntity.builder()
+                .slot(slot)
+                .customer(customer)
+                .build()
+        ).toDto();
+    }
+
+    public SlotRegistrationDTO create(SlotRegistrationDTO dto)  throws IllegalArgumentException {
+        if (Objects.nonNull(dto.getId())) {
+            throw new IllegalArgumentException();
+        }
+
+        return create(dto.getSlotId(), dto.getCustomerId());
+    }
+
+    public void delete(Long id) {
+        slotRegistrationRepository.deleteById(id);
+    }
+
+    public void deleteAllBySlot(Long slotId) {
+        slotRegistrationRepository.deleteBySlotId(slotId);
+    }
+
+    public void deleteAllByCustomer(Long customerId) {
+        slotRegistrationRepository.deleteByCustomerId(customerId);
+    }
+}
+

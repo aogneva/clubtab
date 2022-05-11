@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 
 import javax.persistence.*;
 
@@ -26,5 +27,10 @@ public class SlotRegistrationEntity {
     @ManyToOne
     @JoinColumn(name="customer_id")
     private PersonEntity customer;
+
+    public SlotRegistrationDTO toDto() {
+        return new SlotRegistrationDTO(id, slot.getId(), customer.getId());
+    }
+
 
 }
