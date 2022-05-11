@@ -65,7 +65,7 @@ class SlotIntegrityTest {
 
     @BeforeEach
     private void before() {
-        PersonEntity p = new PersonEntity(null, "Елена",  "Максимовна", "Усова", "9124578274");
+        PersonEntity p = new PersonEntity(null, "Елена",  "Максимовна", "Усова", "9124578274", null);
         executor = personRepository.save(p);
     }
 
@@ -88,7 +88,7 @@ class SlotIntegrityTest {
     void getOne() throws Exception {
         ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_MASSAGE).orElseThrow();
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
-        SlotEntity dto = new SlotEntity(null, Instant.now(), 30L, serviceType.getCapacity(), serviceType, executor, state);
+        SlotEntity dto = new SlotEntity(null, Instant.now(), 30L, serviceType.getCapacity(), serviceType, executor, state, null);
         dto = slotRepository.save(dto);
         if (dto.getId()!=null) {
             toDeleteList.add(dto.getId());
