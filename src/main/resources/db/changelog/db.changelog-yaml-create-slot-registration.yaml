@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-slot-registration
+      author: anna_ogneva
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: slot_registration
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_slot_registration_slot
+                    references: slot(id)
+                  name: slot_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    foreignKeyName: fk_slot_registration_person
+                    references: person(id)
+                  name: customer_id
+                  type: BIGINT
+            tableName: slot_registration

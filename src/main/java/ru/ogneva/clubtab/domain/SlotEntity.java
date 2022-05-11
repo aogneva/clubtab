@@ -8,6 +8,8 @@ import ru.ogneva.clubtab.dto.SlotDTO;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -47,6 +49,9 @@ public class SlotEntity {
     @ManyToOne(targetEntity = StateTypeEntity.class)
     private StateTypeEntity state;
 
+    @OneToMany(mappedBy = "slot")
+    private List<SlotRegistrationEntity> registrations;
+
     public SlotDTO toDto() {
         return SlotDTO.builder()
                 .id(id)
@@ -60,12 +65,15 @@ public class SlotEntity {
     }
 
     public static SlotEntity toEntity(SlotDTO slotDTO) {
-        return SlotEntity.builder()
-            .id(slotDTO.getId())
-            .duration(slotDTO.getDuration())
-            .availableSeats(slotDTO.getAvailableSeats())
-            .startTime(slotDTO.getStartTime())
-            .build();
+        return new SlotEntity(
+            slotDTO.getId(),
+            slotDTO.getStartTime(),
+            slotDTO.getDuration(),
+            slotDTO.getAvailableSeats(),
+            null,
+            null,
+            null,
+            new ArrayList<>());
     }
 
     @Override

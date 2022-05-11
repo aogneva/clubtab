@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/db.changelog-update-service-type-20220505.yaml
   - include:
       file: db/changelog/db.changelog-update-slot-20220505.yaml
+  - include:
+      file: db/changelog/db.changelog-yaml-create-slot-registration.yaml

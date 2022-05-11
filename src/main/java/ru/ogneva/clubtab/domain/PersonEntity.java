@@ -9,7 +9,8 @@ import ru.ogneva.clubtab.dto.PersonDTO;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -38,6 +39,9 @@ public class PersonEntity {
     @NotNull
     private String phone;
 
+    @OneToMany(mappedBy = "customer")
+    private List<SlotRegistrationEntity> registrations;
+
     public PersonDTO toDto() {
         return new PersonDTO(id, firstName, secondName, lastName, phone);
     }
@@ -48,7 +52,8 @@ public class PersonEntity {
                 personDTO.getFirstName(),
                 personDTO.getSecondName(),
                 personDTO.getLastName(),
-                personDTO.getPhone()
+                personDTO.getPhone(),
+                new ArrayList<>()
         );
     }
 
