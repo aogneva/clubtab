@@ -1,7 +1,10 @@
 package ru.ogneva.clubtab.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.collection.IsEmptyCollection;
+import com.jayway.jsonpath.JsonPath;
+import org.hamcrest.beans.HasPropertyWithValue;
+import org.hamcrest.core.Every;
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.ogneva.clubtab.common.Constants;
 import ru.ogneva.clubtab.domain.*;
@@ -20,10 +23,12 @@ import ru.ogneva.clubtab.service.SlotRegistrationService;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -63,7 +68,7 @@ class SlotRegistrationIntegrityTest {
     private PersonEntity masterYoga;
     private PersonEntity massager;
 
-    private SlotEntity jogaSlot;
+    private SlotEntity yogaSlot;
 
     private SlotEntity massageSlot;
 
@@ -78,11 +83,11 @@ class SlotRegistrationIntegrityTest {
         personRepository.save(massager);
         personToDeleteList.add(masterYoga.getId());
         personToDeleteList.add(massager.getId());
-        jogaSlot = new SlotEntity(null, Instant.now(), 60L, serviceMassage.getCapacity(), serviceYoga, masterYoga, state, null);
+        yogaSlot = new SlotEntity(null, Instant.now(), 60L, serviceMassage.getCapacity(), serviceYoga, masterYoga, state, null);
         massageSlot = new SlotEntity(null, Instant.now(), 45L, serviceMassage.getCapacity(), serviceMassage, massager, state, null);
-        jogaSlot = slotRepository.save(jogaSlot);
+        yogaSlot = slotRepository.save(yogaSlot);
         massageSlot = slotRepository.save(massageSlot);
-        slotToDeleteList.add(jogaSlot.getId());
+        slotToDeleteList.add(yogaSlot.getId());
         slotToDeleteList.add(massageSlot.getId());
 
     }
@@ -107,25 +112,44 @@ class SlotRegistrationIntegrityTest {
     @Test
     @DisplayName("GET slot registrations by customer")
     void getSlotRegByCustomer() throws Exception {
-//        mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/customer/{customerId}", masterYoga.getId()))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.customerId").value(masterYoga.getId())
-//        );
+        SlotRegistrationEntity massageReg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, massageSlot, masterYoga));
+        SlotRegistrationEntity yogaReg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, yogaSlot, masterYoga));
+        slotRegistrationToDeleteList.add(massageReg.getId());
+        slotRegistrationToDeleteList.add(yogaReg.getId());
+        MvcResult res = mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/customer/{customerId}", masterYoga.getId()))
+            .andExpect(status().isOk())
+            .andReturn();
+        List<Integer> customers = JsonPath.parse(res.getResponse().getContentAsString()).read("$[*].customerId");
+        assertThat(customers, Every.everyItem(equalTo(masterYoga.getId().intValue())));
     }
 
     @Test
     @DisplayName("GET slot registrations by slot")
-    void getSlotRegBySlot() {
+    void getSlotRegBySlot() throws Exception {
+        SlotRegistrationEntity massageReg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, yogaSlot, masterYoga));
+        SlotRegistrationEntity yogaReg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, yogaSlot, massager));
+        slotRegistrationToDeleteList.add(massageReg.getId());
+        slotRegistrationToDeleteList.add(yogaReg.getId());
+        MvcResult res = mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/slot/{slotId}", yogaSlot.getId()))
+            .andExpect(status().isOk()).andReturn();
+        List<Integer> slots = JsonPath.parse(res.getResponse().getContentAsString()).read("$[*].slotId");
+        assertThat(slots, Every.everyItem(equalTo(yogaSlot.getId().intValue())));
     }
 
     @Test
     @DisplayName("GET slot registration by id")
     void getOne() throws Exception {
-//        Long slotReg = 1L;
-//        mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/{id}", slotReg))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.id").value(slotReg)
-//        );
+        SlotRegistrationEntity yogaReg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, yogaSlot, massager));
+        slotRegistrationToDeleteList.add(yogaReg.getId());
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/{id}", yogaReg.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(yogaReg.getId())
+        );
     }
 
     @Test

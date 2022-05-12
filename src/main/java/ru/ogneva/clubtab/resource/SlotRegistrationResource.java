@@ -9,6 +9,7 @@ import ru.ogneva.clubtab.service.SlotRegistrationService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value="/slot-reg")
@@ -35,6 +36,25 @@ public class SlotRegistrationResource {
     @GetMapping
     public ResponseEntity<List<SlotRegistrationDTO>> getAll() {
         return ResponseEntity.ok().body(slotRegistrationService.findAll());
+    }
+
+    @GetMapping(value="/{id}")
+    public ResponseEntity<SlotRegistrationDTO> getOne(@PathVariable("id") Long id) {
+        Optional<SlotRegistrationDTO> reg = slotRegistrationService.findOne(id);
+        if (reg.isPresent()) {
+            return ResponseEntity.ok().body(reg.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    @GetMapping(value="/slot/{slotId}")
+    public ResponseEntity<List<SlotRegistrationDTO>> getBySlot(@PathVariable("slotId") Long slotId) {
+        return ResponseEntity.ok().body(slotRegistrationService.findBySlot(slotId));
+    }
+
+    @GetMapping(value="/customer/{customerId}")
+    public ResponseEntity<List<SlotRegistrationDTO>> getByCustomer(@PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok().body(slotRegistrationService.findByCustomer(customerId));
     }
 
     @DeleteMapping(value="/{id}")

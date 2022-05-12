@@ -12,6 +12,7 @@ import ru.ogneva.clubtab.repository.SlotRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,9 +33,24 @@ public class SlotRegistrationService {
     }
 
     public List<SlotRegistrationDTO> findAll() {
-        return slotRegistrationRepository.findAll().stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
+        return slotRegistrationRepository.findAll()
+                .stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
     }
 
+    public Optional<SlotRegistrationDTO> findOne(Long id) {
+        return slotRegistrationRepository.findById(id)
+                .map(SlotRegistrationEntity::toDto);
+    }
+
+    public List<SlotRegistrationDTO> findBySlot(Long slotId) {
+        return slotRegistrationRepository.findBySlotId(slotId)
+                .stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
+    }
+
+    public List<SlotRegistrationDTO> findByCustomer(Long customerId) {
+        return slotRegistrationRepository.findByCustomerId(customerId)
+                .stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
+    }
     public SlotRegistrationDTO create(Long slotId, Long customerId)
             throws IllegalArgumentException, NoSuchElementException {
         if (Objects.isNull(slotId) || Objects.isNull(customerId)) {
