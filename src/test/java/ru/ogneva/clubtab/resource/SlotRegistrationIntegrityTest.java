@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -148,8 +149,7 @@ class SlotRegistrationIntegrityTest {
         slotRegistrationToDeleteList.add(yogaReg.getId());
         mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/{id}", yogaReg.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(yogaReg.getId())
-        );
+            .andExpect(jsonPath("$.id").value(yogaReg.getId()));
     }
 
     @Test
@@ -163,7 +163,14 @@ class SlotRegistrationIntegrityTest {
 
     @Test
     @DisplayName("DELETE slot registration")
-    void delete() {
+    void delete() throws Exception {
+        SlotRegistrationEntity reg = slotRegistrationRepository.save(
+            new SlotRegistrationEntity(null, massageSlot, masterYoga));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/slot-reg/{id}", reg.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/{id}", reg.getId()))
+                .andExpect(status().isNotFound());
     }
 
 
