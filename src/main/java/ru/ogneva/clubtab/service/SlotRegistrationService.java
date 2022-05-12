@@ -9,6 +9,7 @@ import ru.ogneva.clubtab.repository.PersonRepository;
 import ru.ogneva.clubtab.repository.SlotRegistrationRepository;
 import ru.ogneva.clubtab.repository.SlotRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class SlotRegistrationService {
 
     private final SlotRepository slotRepository;
@@ -80,12 +82,12 @@ public class SlotRegistrationService {
         slotRegistrationRepository.deleteById(id);
     }
 
-    public void deleteAllBySlot(Long slotId) {
-        slotRegistrationRepository.deleteBySlotId(slotId);
+    public Integer deleteAllBySlot(Long slotId) {
+        return slotRegistrationRepository.deleteBySlotId(slotId).size();
     }
 
-    public void deleteAllByCustomer(Long customerId) {
-        slotRegistrationRepository.deleteByCustomerId(customerId);
+    public int deleteAllByCustomer(Long customerId) {
+        return slotRegistrationRepository.deleteByCustomerId(customerId).size();
     }
 }
 

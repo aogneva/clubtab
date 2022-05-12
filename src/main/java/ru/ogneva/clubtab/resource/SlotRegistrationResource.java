@@ -64,15 +64,13 @@ public class SlotRegistrationResource {
     }
 
     @DeleteMapping(value="/slot/{slotId}")
-    public ResponseEntity<Void> unregisterSlot(@PathVariable("slotId") Long slotId) {
-        slotRegistrationService.deleteAllBySlot(slotId);
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<Integer> unregisterSlot(@PathVariable("slotId") Long slotId) {
+        return ResponseEntity.ok().body(slotRegistrationService.deleteAllBySlot(slotId));
     }
 
-    @DeleteMapping(value="/person/{customerId}")
-    public ResponseEntity<Void> unregisterCustomer(@PathVariable("customerId") Long customerId) {
-        slotRegistrationService.deleteAllByCustomer(customerId);
-        return ResponseEntity.ok().body(null);
+    @DeleteMapping(value="/customer/{customerId}")
+    public ResponseEntity<Integer> unregisterCustomer(@PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok().body(slotRegistrationService.deleteAllByCustomer(customerId));
     }
 
 }

@@ -2,9 +2,7 @@ package ru.ogneva.clubtab.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import org.hamcrest.beans.HasPropertyWithValue;
 import org.hamcrest.core.Every;
-import org.hamcrest.core.Is;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,12 +21,10 @@ import ru.ogneva.clubtab.service.SlotRegistrationService;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -166,6 +161,8 @@ class SlotRegistrationIntegrityTest {
     void delete() throws Exception {
         SlotRegistrationEntity reg = slotRegistrationRepository.save(
             new SlotRegistrationEntity(null, massageSlot, masterYoga));
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/{id}", reg.getId()))
+                .andExpect(status().isOk());
         mockMvc.perform(MockMvcRequestBuilders.delete("/slot-reg/{id}", reg.getId()))
                 .andExpect(status().isOk());
 
@@ -173,5 +170,23 @@ class SlotRegistrationIntegrityTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("DELETE slot registration by slotId")
+    void deleteBySlot() throws Exception {
+        SlotRegistrationEntity reg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, massageSlot, masterYoga));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/slot-reg/slot/{slotId}", reg.getSlot().getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json("1"));
+    }
 
+    @Test
+    @DisplayName("DELETE slot registration by customerId")
+    void deleteByCustomer() throws Exception {
+        SlotRegistrationEntity reg = slotRegistrationRepository.save(
+                new SlotRegistrationEntity(null, massageSlot, masterYoga));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/slot-reg/customer/{customerId}", reg.getCustomer().getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json("1"));
+    }
 }
