@@ -106,9 +106,7 @@ class SlotIntegrityTest {
             .andReturn();
     }
 
-    @Test
-    @DisplayName("POST & PUT slot")
-    void create() throws Exception {
+    private SlotDTO getSlotDto() {
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
         ServiceTypeEntity serviceType = serviceTypeRepository.findByTag(Constants.ServiceTypes.BODY_PILLING).orElseThrow();
         SlotDTO dto = SlotDTO.builder()
@@ -118,6 +116,13 @@ class SlotIntegrityTest {
                 .executorId(executor!=null ? executor.getId() : null)
                 .serviceTypeId(serviceType.getId())
                 .build();
+        return dto;
+    }
+
+    @Test
+    @DisplayName("POST & PUT slot")
+    void create() throws Exception {
+        SlotDTO dto = getSlotDto();
 
         MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/slot")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +130,7 @@ class SlotIntegrityTest {
             )
             .andExpectAll(status().isCreated(),
                 jsonPath("$.id").isNotEmpty(),
-                jsonPath("$.duration").value(serviceType.getDuration()), /* !! check duration setting default */
+                jsonPath("$.duration").value(dto.getDuration()), /* !! check duration setting default */
                 jsonPath("$.availableSeats").value(dto.getAvailableSeats()), /* !! check duration setting default */
                 jsonPath("$.stateId").value(dto.getStateId()),
                 jsonPath("$.serviceTypeId").value(dto.getServiceTypeId()),
@@ -158,5 +163,54 @@ class SlotIntegrityTest {
                         jsonPath("$.executorId").value(updateDto.getExecutorId())
                 );
     }
+
+    @Test
+    @DisplayName("Завершить слот")
+    void testComplete() throws Exception {
+        StateTypeEntity stateScheduled = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
+        StateTypeEntity stateCompleted = stateTypeRepository.findByTag(Constants.StateTypes.STATE_COMPLETED).orElseThrow();
+        SlotDTO dto = getSlotDto();
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/slot")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+            )
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.stateId").value(stateScheduled.getId().intValue()))
+            .andReturn();
+        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        assertThat(id, is(notNullValue()));
+        assertThat(id.longValue(), is(notNullValue()));
+        toDeleteList.add(id.longValue());
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/complete/{id}", id))
+            .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.stateId").value(stateCompleted.getId().intValue()));
+    }
+
+    @Test
+    @DisplayName("Отменить слот")
+    void testCansel() throws Exception {
+        StateTypeEntity stateScheduled = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
+        StateTypeEntity stateCanceled = stateTypeRepository.findByTag(Constants.StateTypes.STATE_CANCELED).orElseThrow();
+        SlotDTO dto = getSlotDto();
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/slot")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto))
+        )
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.stateId").value(stateScheduled.getId().intValue()))
+            .andReturn();
+        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        assertThat(id, is(notNullValue()));
+        assertThat(id.longValue(), is(notNullValue()));
+        toDeleteList.add(id.longValue());
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/cancel/{id}", id))
+            .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.stateId").value(stateCanceled.getId().intValue()));
+    }
+
 
 }
