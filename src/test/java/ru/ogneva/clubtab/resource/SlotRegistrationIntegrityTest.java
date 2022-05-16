@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -19,6 +20,7 @@ import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 import ru.ogneva.clubtab.repository.*;
 import ru.ogneva.clubtab.service.SlotRegistrationService;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.*;
 
@@ -149,9 +151,17 @@ class SlotRegistrationIntegrityTest {
 
     @Test
     @DisplayName("POST slot registration")
-    void create() {
-        SlotRegistrationDTO reg = slotRegistrationService.create(massageSlot.getId(), masterYoga.getId());
-        slotRegistrationToDeleteList.add(reg.getId());
+    void create() throws Exception {
+        MvcResult res = mockMvc.perform(
+            MockMvcRequestBuilders.post("/slot-reg/{slotId}/{customerId}", massageSlot.getId(), masterYoga.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isCreated())
+            .andReturn();
+        try {
+            Integer id = JsonPath.parse(res.getResponse().getContentAsString()).read("$.id");
+            slotRegistrationToDeleteList.add(id.longValue());
+        } catch (UnsupportedEncodingException e) {}
         List<SlotRegistrationEntity> slotRegs = slotRegistrationRepository.findAll();
         assertThat(slotRegs, is(not(empty())));
     }

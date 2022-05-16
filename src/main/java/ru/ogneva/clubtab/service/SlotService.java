@@ -1,12 +1,15 @@
 package ru.ogneva.clubtab.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.ogneva.clubtab.common.Constants;
 import ru.ogneva.clubtab.common.ForbiddenAlertException;
 import ru.ogneva.clubtab.domain.ServiceTypeEntity;
 import ru.ogneva.clubtab.domain.SlotEntity;
 import ru.ogneva.clubtab.domain.StateTypeEntity;
 import ru.ogneva.clubtab.dto.SlotDTO;
+import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 import ru.ogneva.clubtab.repository.*;
 
 import javax.management.InstanceNotFoundException;
@@ -22,18 +25,18 @@ public class SlotService {
     final private ServiceTypeRepository serviceTypeRepository;
     final private StateTypeRepository stateTypeRepository;
     final private PersonRepository personRepository;
-    final private SlotRegistrationRepository slotRegistrationRepository;
+    final private SlotRegistrationService slotRegistrationService;
 
     public SlotService(SlotRepository slotRepository,
                        ServiceTypeRepository serviceTypeRepository,
                        StateTypeRepository stateTypeRepository,
                        PersonRepository personRepository,
-                       SlotRegistrationRepository slotRegistrationRepository) {
+                       SlotRegistrationService slotRegistrationService) {
         this.slotRepository = slotRepository;
         this.serviceTypeRepository = serviceTypeRepository;
         this.stateTypeRepository = stateTypeRepository;
         this.personRepository = personRepository;
-        this.slotRegistrationRepository = slotRegistrationRepository;
+        this.slotRegistrationService = slotRegistrationService;
     }
 
     public List<SlotDTO> findAll() {
@@ -53,7 +56,7 @@ public class SlotService {
             throw new ForbiddenAlertException(String.format("Невозможно удалить в статусе %s", slot.get().getState().getName()));
         }
 
-        Integer countRegs = slotRegistrationRepository.countBySlotId(id);
+        Integer countRegs = slotRegistrationService.countBySlot(id);
         if (countRegs>0) {
             throw new ForbiddenAlertException("Имеются зарегистрированные участники");
         }
@@ -117,5 +120,33 @@ public class SlotService {
             throw new ForbiddenAlertException("Неверный статус слота");
         }
         return changeSlotState(slotEntity, Constants.StateTypes.STATE_CANCELED).toDto();
+    }
+
+    @Transactional(isolation=Isolation.READ_COMMITTED)
+    public SlotRegistrationDTO registerCustomer(Long slotId, Long customerId)
+        throws IllegalArgumentException, NoSuchElementException, ForbiddenAlertException
+    {
+        if (Objects.isNull(slotId) || Objects.isNull(customerId)) {
+            throw new IllegalArgumentException();
+        }
+        SlotRegistrationDTO reg = null;
+        SlotEntity slot = slotRepository.findById(slotId).orElseThrow(() -> new NoSuchElementException());
+        if (!canModify(slot.getState().getTag())) {
+            throw new ForbiddenAlertException("Неверный статус слота");
+        }
+        if (slot.getAvailableSeats()<1) {
+            throw new ForbiddenAlertException("Свободных мест нет");
+        }
+        try {
+            reg = slotRegistrationService.create(slot, customerId);
+        } catch (Exception e) {
+            return reg;
+        }
+        slot.setAvailableSeats(slot.getAvailableSeats()-1);
+        return reg;
+    }
+
+    public boolean canModify(String statusTag) {
+        return Constants.StateTypes.STATE_SCHEDULED.equalsIgnoreCase(statusTag);
     }
 }

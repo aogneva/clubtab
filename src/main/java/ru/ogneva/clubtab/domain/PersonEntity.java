@@ -9,7 +9,6 @@ import ru.ogneva.clubtab.dto.PersonDTO;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

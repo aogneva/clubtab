@@ -4,8 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ru.ogneva.clubtab.common.ForbiddenAlertException;
 import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 import ru.ogneva.clubtab.service.SlotRegistrationService;
+import ru.ogneva.clubtab.service.SlotService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,18 +17,21 @@ import java.util.Optional;
 @RequestMapping(value="/slot-reg")
 public class SlotRegistrationResource {
     private final SlotRegistrationService slotRegistrationService;
+    private final SlotService slotService;
 
-    SlotRegistrationResource(final SlotRegistrationService slotRegistrationService) {
+    SlotRegistrationResource(final SlotRegistrationService slotRegistrationService,
+                             final SlotService slotService) {
         this.slotRegistrationService = slotRegistrationService;
+        this.slotService = slotService;
     }
 
-    @PostMapping(value="/{slotId}/{personId}")
+    @PostMapping(value="/{slotId}/{customerId}")
     public ResponseEntity<SlotRegistrationDTO> register(@PathVariable("slotId") Long slotId,
-                                                     @PathVariable("personId") Long personId) {
+                                                     @PathVariable("customerId") Long customerId) {
         try {
-            SlotRegistrationDTO reg = slotRegistrationService.create(slotId, personId);
+            SlotRegistrationDTO reg = slotService.registerCustomer(slotId, customerId);
             return ResponseEntity.status(HttpStatus.CREATED).body(reg);
-        } catch (IllegalArgumentException e) {
+        } catch (ForbiddenAlertException | IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Null parameters are not expected", e);
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found slot or person", e);

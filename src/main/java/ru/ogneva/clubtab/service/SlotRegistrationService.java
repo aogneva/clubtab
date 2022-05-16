@@ -53,13 +53,15 @@ public class SlotRegistrationService {
         return slotRegistrationRepository.findByCustomerId(customerId)
                 .stream().map(SlotRegistrationEntity::toDto).collect(Collectors.toList());
     }
-    public SlotRegistrationDTO create(Long slotId, Long customerId)
+    public Integer countBySlot(Long slotId) {
+        return slotRegistrationRepository.countBySlotId(slotId);
+    }
+    SlotRegistrationDTO create(SlotEntity slot, Long customerId)
             throws IllegalArgumentException, NoSuchElementException {
-        if (Objects.isNull(slotId) || Objects.isNull(customerId)) {
+        if (Objects.isNull(slot) || Objects.isNull(customerId)) {
             throw new IllegalArgumentException();
         }
 
-        SlotEntity slot = slotRepository.findById(slotId).orElseThrow(() -> new NoSuchElementException());
         PersonEntity customer = personRepository.findById(customerId).orElseThrow(() -> new NoSuchElementException());
 
         return slotRegistrationRepository.save(
@@ -70,7 +72,17 @@ public class SlotRegistrationService {
         ).toDto();
     }
 
-    public SlotRegistrationDTO create(SlotRegistrationDTO dto)  throws IllegalArgumentException {
+    SlotRegistrationDTO create(Long slotId, Long customerId)
+        throws IllegalArgumentException, NoSuchElementException {
+        if (Objects.isNull(slotId) || Objects.isNull(customerId)) {
+            throw new IllegalArgumentException();
+        }
+
+        SlotEntity slot = slotRepository.findById(slotId).orElseThrow(() -> new NoSuchElementException());
+        return create(slot, customerId);
+    }
+
+    SlotRegistrationDTO create(SlotRegistrationDTO dto)  throws IllegalArgumentException {
         if (Objects.nonNull(dto.getId())) {
             throw new IllegalArgumentException();
         }
@@ -89,5 +101,6 @@ public class SlotRegistrationService {
     public int deleteAllByCustomer(Long customerId) {
         return slotRegistrationRepository.deleteByCustomerId(customerId).size();
     }
+
 }
 
