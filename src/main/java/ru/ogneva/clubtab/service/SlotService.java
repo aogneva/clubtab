@@ -112,6 +112,7 @@ public class SlotService {
         return changeSlotState(slotEntity, Constants.StateTypes.STATE_COMPLETED).toDto();
     }
 
+    @Transactional(isolation=Isolation.READ_COMMITTED)
     public SlotDTO cancel(Long id) throws ForbiddenAlertException, InstanceNotFoundException {
         if (Objects.isNull(id)) {
             throw new ForbiddenAlertException("Не задан ID");
@@ -120,6 +121,7 @@ public class SlotService {
         if (!Constants.StateTypes.STATE_SCHEDULED.equalsIgnoreCase(slotEntity.getState().getTag())) {
             throw new ForbiddenAlertException("Неверный статус слота");
         }
+        slotRegistrationService.deleteAllBySlot(slotEntity.getId());
         return changeSlotState(slotEntity, Constants.StateTypes.STATE_CANCELED).toDto();
     }
 

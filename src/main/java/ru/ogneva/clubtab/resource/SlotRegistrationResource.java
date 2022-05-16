@@ -57,6 +57,11 @@ public class SlotRegistrationResource {
         return ResponseEntity.ok().body(slotRegistrationService.findBySlot(slotId));
     }
 
+    @GetMapping(value="/slot/count/{slotId}")
+    public ResponseEntity<Integer> getCountBySlot(@PathVariable("slotId") Long slotId) {
+        return ResponseEntity.ok().body(slotRegistrationService.countBySlot(slotId));
+    }
+
     @GetMapping(value="/customer/{customerId}")
     public ResponseEntity<List<SlotRegistrationDTO>> getByCustomer(@PathVariable("customerId") Long customerId) {
         return ResponseEntity.ok().body(slotRegistrationService.findByCustomer(customerId));

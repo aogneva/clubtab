@@ -12,10 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.ogneva.clubtab.common.Constants;
-import ru.ogneva.clubtab.domain.PersonEntity;
-import ru.ogneva.clubtab.domain.ServiceTypeEntity;
-import ru.ogneva.clubtab.domain.SlotEntity;
-import ru.ogneva.clubtab.domain.StateTypeEntity;
+import ru.ogneva.clubtab.domain.*;
 import ru.ogneva.clubtab.dto.SlotDTO;
 import ru.ogneva.clubtab.repository.PersonRepository;
 import ru.ogneva.clubtab.repository.ServiceTypeRepository;
@@ -60,13 +57,16 @@ class SlotIntegrityTest {
     private MockMvc mockMvc;
 
     static private PersonEntity executor;
+    static private PersonEntity customer;
 
     final private List<Long> toDeleteList = new ArrayList<>();
 
     @BeforeEach
     private void before() {
         PersonEntity p = new PersonEntity(null, "Елена",  "Максимовна", "Усова", "9124578274", null);
+        PersonEntity p2 = new PersonEntity(null, "Александр",  "Николаевич", "Петров", "9097008166", null);
         executor = personRepository.save(p);
+        customer = personRepository.save(p2);
     }
 
     @AfterEach
@@ -74,6 +74,7 @@ class SlotIntegrityTest {
         toDeleteList.forEach(slotId -> slotRepository.deleteById(slotId));
         toDeleteList.clear();
         personRepository.deleteById(executor.getId());
+        personRepository.deleteById(customer.getId());
     }
 
     @Test
@@ -203,16 +204,21 @@ class SlotIntegrityTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.stateId").value(stateScheduled.getId().intValue()))
             .andReturn();
-        Integer id = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
-        assertThat(id, is(notNullValue()));
-        assertThat(id.longValue(), is(notNullValue()));
-        toDeleteList.add(id.longValue());
-        mockMvc.perform(MockMvcRequestBuilders.get("/slot/cancel/{id}", id))
+        Integer slotId = JsonPath.parse(response.getResponse().getContentAsString()).read("$.id");
+        assertThat(slotId, is(notNullValue()));
+        assertThat(slotId.longValue(), is(notNullValue()));
+        toDeleteList.add(slotId.longValue());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/slot-reg/{slotId}/{customerId}", slotId, customer.getId())
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/cancel/{id}", slotId))
             .andExpect(status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.get("/slot/{id}", slotId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.stateId").value(stateCanceled.getId().intValue()));
-        MvcResult respReg = mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/slot/{id}", id))
+        MvcResult respReg = mockMvc.perform(MockMvcRequestBuilders.get("/slot-reg/slot/{slotId}", slotId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", Matchers.hasSize(0)))
             .andReturn();
