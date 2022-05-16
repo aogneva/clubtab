@@ -15,6 +15,8 @@ public interface SlotRegistrationRepository extends JpaRepository<SlotRegistrati
 
     List<SlotRegistrationEntity> findBySlotId(Long slotId);
 
+    Integer countBySlotId(Long slotId);
+
     List<SlotRegistrationEntity> deleteBySlotId(Long slotId);
 
     List<SlotRegistrationEntity> deleteByCustomerId(Long personId);

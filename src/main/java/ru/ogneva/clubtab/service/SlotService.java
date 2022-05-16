@@ -7,10 +7,7 @@ import ru.ogneva.clubtab.domain.ServiceTypeEntity;
 import ru.ogneva.clubtab.domain.SlotEntity;
 import ru.ogneva.clubtab.domain.StateTypeEntity;
 import ru.ogneva.clubtab.dto.SlotDTO;
-import ru.ogneva.clubtab.repository.PersonRepository;
-import ru.ogneva.clubtab.repository.ServiceTypeRepository;
-import ru.ogneva.clubtab.repository.SlotRepository;
-import ru.ogneva.clubtab.repository.StateTypeRepository;
+import ru.ogneva.clubtab.repository.*;
 
 import javax.management.InstanceNotFoundException;
 import java.util.List;
@@ -22,20 +19,21 @@ import java.util.stream.Collectors;
 @Service
 public class SlotService {
     final private SlotRepository slotRepository;
-
     final private ServiceTypeRepository serviceTypeRepository;
     final private StateTypeRepository stateTypeRepository;
-
     final private PersonRepository personRepository;
+    final private SlotRegistrationRepository slotRegistrationRepository;
 
     public SlotService(SlotRepository slotRepository,
                        ServiceTypeRepository serviceTypeRepository,
                        StateTypeRepository stateTypeRepository,
-                       PersonRepository personRepository) {
+                       PersonRepository personRepository,
+                       SlotRegistrationRepository slotRegistrationRepository) {
         this.slotRepository = slotRepository;
         this.serviceTypeRepository = serviceTypeRepository;
         this.stateTypeRepository = stateTypeRepository;
         this.personRepository = personRepository;
+        this.slotRegistrationRepository = slotRegistrationRepository;
     }
 
     public List<SlotDTO> findAll() {
@@ -46,7 +44,20 @@ public class SlotService {
         return slotRepository.findById(id).map(SlotEntity::toDto);
     }
 
-    public void delete(Long id) {
+    public void delete(Long id)  throws NoSuchElementException, ForbiddenAlertException {
+        Optional<SlotEntity> slot = slotRepository.findById(id);
+        if (slot.isEmpty()) {
+            throw new NoSuchElementException("Слот не найден");
+        }
+        if (!Constants.StateTypes.STATE_SCHEDULED.equalsIgnoreCase(slot.get().getState().getTag())) {
+            throw new ForbiddenAlertException(String.format("Невозможно удалить в статусе %s", slot.get().getState().getName()));
+        }
+
+        Integer countRegs = slotRegistrationRepository.countBySlotId(id);
+        if (countRegs>0) {
+            throw new ForbiddenAlertException("Имеются зарегистрированные участники");
+        }
+
         slotRepository.deleteById(id);
     }
 

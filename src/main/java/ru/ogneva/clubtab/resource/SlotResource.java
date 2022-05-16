@@ -10,6 +10,7 @@ import ru.ogneva.clubtab.service.SlotService;
 
 import javax.management.InstanceNotFoundException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -92,4 +93,14 @@ public class SlotResource {
         return ResponseEntity.ok().build();
     }
 
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        try {
+            slotService.delete(id);
+        } catch ( NoSuchElementException | ForbiddenAlertException fe) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }
