@@ -12,3 +12,12 @@ databaseChangeLog:
                   type: NUMERIC
                   defaultValue: 0
             tableName: slot
+
+  - changeSet:
+      id: slot-modify-20220516-1724
+      author: anna_ogneva
+      changes:
+        - renameColumn:
+            oldColumnName: available_seats
+            newColumnName: capacity
+            tableName: slot

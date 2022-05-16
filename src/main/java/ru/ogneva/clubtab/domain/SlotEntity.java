@@ -5,11 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.ogneva.clubtab.dto.SlotDTO;
-import ru.ogneva.clubtab.dto.SlotRegistrationDTO;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,8 +33,8 @@ public class SlotEntity {
     @Column(name ="duration")
     private Long duration;
 
-    @Column(name = "available_seats")
-    private Integer availableSeats;
+    @Column(name = "capacity")
+    private Integer capacity;
 
     @JoinColumn(name="service_type_id")
     @ManyToOne(targetEntity = ServiceTypeEntity.class)
@@ -58,7 +56,7 @@ public class SlotEntity {
                 .id(id)
                 .startTime(startTime)
                 .duration(duration)
-                .availableSeats(availableSeats)
+                .capacity(capacity)
                 .serviceTypeId(serviceType == null ? null : serviceType.getId())
                 .executorId(executor == null ? null : executor.getId())
                 .stateId(state == null ? null : state.getId())
@@ -70,7 +68,7 @@ public class SlotEntity {
             slotDTO.getId(),
             slotDTO.getStartTime(),
             slotDTO.getDuration(),
-            slotDTO.getAvailableSeats(),
+            slotDTO.getCapacity(),
             null,
             null,
             null,
@@ -85,7 +83,7 @@ public class SlotEntity {
         return id.equals(that.id)
                 && startTime.equals(that.startTime)
                 && duration.equals(that.duration)
-                && availableSeats.equals(that.availableSeats)
+                && capacity.equals(that.capacity)
                 && Objects.equals(serviceType, that.serviceType)
                 && Objects.equals(executor, that.executor)
                 && Objects.equals(state, that.state);
@@ -93,7 +91,7 @@ public class SlotEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startTime, duration, availableSeats, serviceType, executor, state);
+        return Objects.hash(id, startTime, duration, capacity, serviceType, executor, state);
     }
 
     @Override
@@ -102,7 +100,7 @@ public class SlotEntity {
                 "id=" + id +
                 ", startTime=" + startTime +
                 ", duration=" + duration +
-                ", availableSeats=" + availableSeats +
+                ", capacity=" + capacity +
                 ", serviceType=" + serviceType +
                 ", executor=" + executor +
                 ", state=" + state +

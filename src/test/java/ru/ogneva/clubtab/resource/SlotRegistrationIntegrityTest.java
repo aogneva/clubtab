@@ -154,8 +154,7 @@ class SlotRegistrationIntegrityTest {
     void create() throws Exception {
         MvcResult res = mockMvc.perform(
             MockMvcRequestBuilders.post("/slot-reg/{slotId}/{customerId}", massageSlot.getId(), masterYoga.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andReturn();
         try {
@@ -164,6 +163,10 @@ class SlotRegistrationIntegrityTest {
         } catch (UnsupportedEncodingException e) {}
         List<SlotRegistrationEntity> slotRegs = slotRegistrationRepository.findAll();
         assertThat(slotRegs, is(not(empty())));
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/slot-reg/{slotId}/{customerId}", massageSlot.getId(), massager.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
     }
 
     @Test

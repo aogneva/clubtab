@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class SlotService {
     final private SlotRepository slotRepository;
     final private ServiceTypeRepository serviceTypeRepository;
@@ -71,8 +72,8 @@ public class SlotService {
         if (slotDTO.getDuration() == null && serviceType!=null) {
             entity.setDuration(serviceType.getDuration());
         }
-        if (slotDTO.getAvailableSeats() == null && serviceType!=null) {
-            entity.setAvailableSeats(serviceType.getCapacity());
+        if (slotDTO.getCapacity() == null && serviceType!=null) {
+            entity.setCapacity(serviceType.getCapacity());
         }
         entity.setServiceType(serviceType);
         entity.setState(slotDTO.getStateId()==null ? null :
@@ -134,7 +135,8 @@ public class SlotService {
         if (!canModify(slot.getState().getTag())) {
             throw new ForbiddenAlertException("Неверный статус слота");
         }
-        if (slot.getAvailableSeats()<1) {
+        Integer availableSeats = getAvailableSeats(slot);
+        if (availableSeats<1) {
             throw new ForbiddenAlertException("Свободных мест нет");
         }
         try {
@@ -142,8 +144,17 @@ public class SlotService {
         } catch (Exception e) {
             return reg;
         }
-        slot.setAvailableSeats(slot.getAvailableSeats()-1);
         return reg;
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    private Integer getAvailableSeats(SlotEntity slot) {
+        return slot.getCapacity() - slotRegistrationService.countBySlot(slot.getId());
+    }
+
+    public Integer getAvailableSeats(Long slotId) throws NoSuchElementException {
+        SlotEntity slot = slotRepository.findById(slotId).orElseThrow(() -> new NoSuchElementException());
+        return getAvailableSeats(slot);
     }
 
     public boolean canModify(String statusTag) {

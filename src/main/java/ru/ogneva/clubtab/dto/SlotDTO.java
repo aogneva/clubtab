@@ -25,7 +25,7 @@ public class SlotDTO implements Serializable {
     private Long serviceTypeId;
     private Long executorId;
     private Long stateId;
-    private Integer availableSeats;
+    private Integer capacity;
 
     @Override
     public SlotDTO clone(){
@@ -33,7 +33,7 @@ public class SlotDTO implements Serializable {
                 .id(id)
                 .startTime(startTime)
                 .duration(duration)
-                .availableSeats(availableSeats)
+                .capacity(capacity)
                 .serviceTypeId(serviceTypeId)
                 .executorId(executorId)
                 .stateId(stateId)
@@ -47,7 +47,7 @@ public class SlotDTO implements Serializable {
         return id.equals(slotDTO.id)
                 && startTime.equals(slotDTO.startTime)
                 && duration.equals(slotDTO.duration)
-                && availableSeats.equals(slotDTO.availableSeats)
+                && capacity.equals(slotDTO.capacity)
                 && Objects.equals(serviceTypeId, slotDTO.serviceTypeId)
                 && Objects.equals(executorId, slotDTO.executorId)
                 && Objects.equals(stateId, slotDTO.stateId);
@@ -55,7 +55,7 @@ public class SlotDTO implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startTime, duration, availableSeats, serviceTypeId, executorId, stateId);
+        return Objects.hash(id, startTime, duration, capacity, serviceTypeId, executorId, stateId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SlotDTO implements Serializable {
                 "id=" + id +
                 ", start_time=" + startTime +
                 ", duration=" + duration +
-                ", availableSeats=" + availableSeats +
+                ", capacity=" + capacity +
                 ", serviceTypeId=" + serviceTypeId +
                 ", executorId=" + executorId +
                 ", StateId=" + stateId +

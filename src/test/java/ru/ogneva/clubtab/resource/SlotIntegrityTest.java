@@ -98,7 +98,7 @@ class SlotIntegrityTest {
             )
             .andExpectAll(status().isOk(),
                 jsonPath("$.duration").value(slot.getDuration()),
-                jsonPath("$.availableSeats").value(serviceType.getCapacity()),
+                jsonPath("$.capacity").value(serviceType.getCapacity()),
                 jsonPath("$.stateId").value(state.getId()),
                 jsonPath("$.serviceTypeId").value(slot.getServiceType().getId()),
                 jsonPath("$.executorId").value(slot.getExecutor().getId())
@@ -109,7 +109,7 @@ class SlotIntegrityTest {
     private SlotDTO getSlotDto(ServiceTypeEntity serviceType) {
         StateTypeEntity state = stateTypeRepository.findByTag(Constants.StateTypes.STATE_SCHEDULED).orElseThrow();
         SlotDTO dto = SlotDTO.builder()
-                .availableSeats(15)
+                .capacity(15)
                 .startTime(new GregorianCalendar(2022,GregorianCalendar.MAY,12).toInstant())
                 .stateId(state.getId())
                 .executorId(executor!=null ? executor.getId() : null)
@@ -131,7 +131,7 @@ class SlotIntegrityTest {
             .andExpectAll(status().isCreated(),
                 jsonPath("$.id").isNotEmpty(),
                 jsonPath("$.duration").value(serviceType.getDuration()),
-                jsonPath("$.availableSeats").value(dto.getAvailableSeats()), /* !! check duration setting default */
+                jsonPath("$.capacity").value(dto.getCapacity()), /* !! check duration setting default */
                 jsonPath("$.stateId").value(dto.getStateId()),
                 jsonPath("$.serviceTypeId").value(dto.getServiceTypeId()),
                 jsonPath("$.executorId").value(dto.getExecutorId())
