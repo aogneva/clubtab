@@ -24,7 +24,7 @@ Events scheduled in clubtab are called service types. There are some examples of
 * executor
 * customers
  
-Both *executors* and *customers* are united in entity *Person* at this time. Entity *Person* countins information of: 
+Both *executors* and *customers* are united in entity *Person* at this time. Entity *Person* contains information of: 
 * first name
 * second name 
 * last name 
