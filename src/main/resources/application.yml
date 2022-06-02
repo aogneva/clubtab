@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/clubtab
+    url: jdbc:postgresql://localhost:49164/clubtab
     username: postgres
     password: postgres
     initialization-mode: never
